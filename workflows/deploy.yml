@@ -21,10 +21,10 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     
-    # TELL GITHUB YOUR PROJECT IS IN A SUBFOLDER
+    # 1. Tell all 'run' commands to execute inside the docs folder
     defaults:
       run:
-        working-directory: ./docs   # Change "docs" to whatever your folder is named
+        working-directory: ./docs
 
     steps:
       - name: Checkout
@@ -33,9 +33,10 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24 # Fixes the Node 20 deprecation warning
           cache: 'npm'
-          cache-dependency-path: './docs/package-lock.json' # Point cache here too
+          # 2. Tell the caching mechanism exactly where the lock file is
+          cache-dependency-path: './docs/package-lock.json'
           
       - name: Install dependencies
         run: npm ci
@@ -49,6 +50,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
+          # 3. Tell it to grab the compiled files from inside the docs folder
           path: './docs/dist'
           
       - name: Deploy to GitHub Pages
