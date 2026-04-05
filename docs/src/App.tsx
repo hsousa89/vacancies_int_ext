@@ -2,6 +2,7 @@
 import { Route, Routes } from 'react-router-dom';
 import { AppLayout } from './components/layout/AppLayout';
 import { VacancyProvider } from './hooks/useVacancies'; // Add this import
+import { Dashboard } from './pages/DashboardPage';
 import { QueryPage } from './pages/QueryPage';
 import { Results } from './pages/Results';
 
@@ -10,7 +11,7 @@ export default function App() {
     <VacancyProvider>
       <Routes>
         <Route element={<AppLayout />}>
-          <Route path="/" element={<div className="font-headline text-2xl">Dashboard Placeholder</div>} />
+          <Route path="/" element={<Dashboard />} />
           <Route path="/query" element={<QueryPage />} />
           <Route path="/results" element={<Results />} />
         </Route>
