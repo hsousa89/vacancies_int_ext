@@ -31,9 +31,9 @@ export function BottomNav() {
 
   return (
     <nav className="fixed bottom-0 left-0 w-full z-50 bg-white/90 backdrop-blur-md flex justify-around items-center pt-2 pb-6 px-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-      <NavItem to="/" icon="dashboard" label="Dashboard" currentPath={location.pathname} />
-      <NavItem to="/query" icon="travel_explore" label="Query" currentPath={location.pathname} />
-      <NavItem to="/results" icon="table_chart" label="Results" currentPath={location.pathname} />
+      <NavItem to="/" icon="dashboard" label="Painel" currentPath={location.pathname} />
+      <NavItem to="/query" icon="travel_explore" label="Pesquisa" currentPath={location.pathname} />
+      <NavItem to="/results" icon="table_chart" label="Resultados" currentPath={location.pathname} />
     </nav>
   );
 }
