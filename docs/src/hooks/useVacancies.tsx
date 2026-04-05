@@ -114,7 +114,7 @@ export function VacancyProvider({ children }: { children: ReactNode }) {
         code: code ? code.trim() : '?',
         name: rest.length > 0 ? rest.join(' - ').trim() : subjectString,
         totalVacancies: total,
-        isDisabled: total <= 0 
+        isDisabled: scope === 'zone' ? total <= 0 : total === 0
       };
     });
   };
