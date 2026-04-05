@@ -9,9 +9,24 @@ permissions:
   pages: write
   id-token: write
 
+# Prevents multiple deployments from running at the exact same time
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
 jobs:
   deploy:
+    # This exposes the deployed URL in the GitHub UI
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+      
     runs-on: ubuntu-latest
+
+    # Tell GitHub to run all scripts inside your docs folder automatically
+    defaults:
+      run:
+        working-directory: ./docs
 
     steps:
       - name: Checkout
@@ -20,22 +35,22 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
+          # Optional but recommended: caches dependencies to speed up future builds
+          cache: 'npm'
+          cache-dependency-path: './docs/package-lock.json'
 
       - name: Install dependencies
-        run: |
-          cd docs
-          npm install
+        run: npm ci
 
       - name: Build
-        run: |
-          cd docs
-          npm run build
+        run: npm run build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: docs/dist
+          path: './docs/dist'
 
       - name: Deploy
+        id: deployment
         uses: actions/deploy-pages@v4
