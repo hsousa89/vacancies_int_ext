@@ -74,7 +74,7 @@ export function Dashboard() {
       <div className="bg-emerald-600 p-8 rounded-2xl border border-emerald-500 flex flex-col md:flex-row justify-between items-center mb-6 relative overflow-hidden shadow-lg shadow-emerald-100">
         <div className="z-10 text-center md:text-left">
           <p className="text-emerald-100 font-label text-xs uppercase tracking-widest mb-1 font-bold">Vagas Diretas (Contratação QZP)</p>
-          <p className="text-6xl font-headline font-extrabold text-white">+{stats.totalZoneVacancies}</p>
+          <p className="text-6xl font-headline font-extrabold text-white">{stats.totalZoneVacancies > 0 ? '+' : ''}{stats.totalZoneVacancies}</p>
           <div className="mt-2 flex items-center gap-1.5 text-emerald-100/80 text-xs font-semibold bg-white/10 w-fit px-2 py-1 rounded-full">
             <span className="material-symbols-outlined text-sm">trending_up</span>
             <span>Reforço Nacional de Quadros</span>
@@ -87,11 +87,11 @@ export function Dashboard() {
       <section className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
         <div className="bg-emerald-50 p-6 rounded-xl border border-emerald-100">
           <p className="text-emerald-900/60 font-label text-[10px] uppercase tracking-widest font-bold mb-1">Necessidades Escolas (+)</p>
-          <p className="text-3xl font-headline font-bold text-emerald-700">+{stats.totalSchoolNeeds}</p>
+          <p className="text-3xl font-headline font-bold text-emerald-700">{stats.totalSchoolNeeds > 0 ? '+' : ''}{stats.totalSchoolNeeds}</p>
         </div>
         <div className="bg-rose-50 p-6 rounded-xl border border-rose-100">
           <p className="text-rose-900/60 font-label text-[10px] uppercase tracking-widest font-bold mb-1">Excedentes Escolas (-)</p>
-          <p className="text-3xl font-headline font-bold text-rose-700">{stats.totalSchoolSurplus}</p>
+          <p className="text-3xl font-headline font-bold text-rose-700">{stats.totalSchoolSurplus > 0 ? '+' : ''}{stats.totalSchoolSurplus}</p>
         </div>
         <div className="bg-slate-100 p-6 rounded-xl border border-slate-200 shadow-sm">
           <p className="text-slate-900/60 font-label text-[10px] uppercase tracking-widest font-bold mb-1">Balanço Líquido Escolar (=)</p>
@@ -108,48 +108,48 @@ export function Dashboard() {
           <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
             <span className="text-[9px] font-bold uppercase text-slate-400 block mb-1">QZP: Maior Oferta</span>
             <p className="text-sm font-bold text-slate-900 mb-1">{stats.topQzp.name}</p>
-            <div className="text-blue-600 font-bold text-xs">+{stats.topQzp.count} vagas</div>
+            <div className="text-blue-600 font-bold text-xs">{stats.topQzp.count > 0 ? '+' : ''}{stats.topQzp.count} vagas</div>
           </div>
           <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
             <span className="text-[9px] font-bold uppercase text-slate-400 block mb-1">QZP: Menor Oferta</span>
             <p className="text-sm font-bold text-slate-900 mb-1">{stats.bottomQzp.name}</p>
-            <div className="text-slate-400 font-bold text-xs">+{stats.bottomQzp.count} vagas</div>
+            <div className="text-slate-400 font-bold text-xs">{stats.bottomQzp.count > 0 ? '+' : ''}{stats.bottomQzp.count} vagas</div>
           </div>
 
           {/* ZONE SUBJECTS */}
           <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
             <span className="text-[9px] font-bold uppercase text-teal-600 block mb-1">Grupo Maior Procura (QZP)</span>
             <p className="text-sm font-bold text-slate-900 mb-1 line-clamp-1">{stats.topSubZone.name}</p>
-            <div className="text-teal-600 font-bold text-xs">+{stats.topSubZone.count} vagas</div>
+            <div className="text-teal-600 font-bold text-xs">{stats.topSubZone.count > 0 ? '+' : ''}{stats.topSubZone.count} vagas</div>
           </div>
           <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
             <span className="text-[9px] font-bold uppercase text-slate-400 block mb-1">Grupo Menor Procura (QZP)</span>
             <p className="text-sm font-bold text-slate-900 mb-1 line-clamp-1">{stats.bottomSubZone.name}</p>
-            <div className="text-slate-400 font-bold text-xs">+{stats.bottomSubZone.count} vagas</div>
+            <div className="text-slate-400 font-bold text-xs">{stats.bottomSubZone.count > 0 ? '+' : ''}{stats.bottomSubZone.count} vagas</div>
           </div>
 
           {/* SCHOOL SUBJECTS */}
           <div className="bg-emerald-50/40 p-4 rounded-xl border border-emerald-100 shadow-sm">
             <span className="text-[9px] font-bold uppercase text-emerald-700/60 block mb-1">Grupo Maior Procura (QA/ENA)</span>
             <p className="text-sm font-bold text-slate-900 mb-1 line-clamp-1">{stats.bottomSubSchool.name}</p>
-            <div className="text-emerald-700 font-bold text-xs">{stats.bottomSubSchool.count} vagas</div>
+            <div className="text-emerald-700 font-bold text-xs">{stats.bottomSubSchool.count > 0 ? '+' : ''}{stats.bottomSubSchool.count} vagas</div>
           </div>
           <div className="bg-rose-50/40 p-4 rounded-xl border border-rose-100 shadow-sm">
             <span className="text-[9px] font-bold uppercase text-rose-700/60 block mb-1">Grupo Maior Excedente (QA/ENA)</span>
             <p className="text-sm font-bold text-slate-900 mb-1 line-clamp-1">{stats.topSubSchool.name}</p>
-            <div className="text-rose-700 font-bold text-xs">+{stats.topSubSchool.count} vagas</div>
+            <div className="text-rose-700 font-bold text-xs">{stats.topSubSchool.count > 0 ? '+' : ''}{stats.topSubSchool.count} vagas</div>
           </div>
 
           {/* SPECIFIC SCHOOLS */}
           <div className="bg-emerald-50/40 p-4 rounded-xl border border-emerald-100 shadow-sm">
             <span className="text-[9px] font-bold uppercase text-emerald-700/60 block mb-1">Escola: Top Vagas</span>
-            <p className="text-[11px] font-bold text-slate-900 mb-1 line-clamp-2 leading-tight">{stats.topSchool.name}</p>
-            <div className="text-emerald-700 font-bold text-xs">+{stats.topSchool.count} total</div>
+            <p className="text-[11px] font-bold text-slate-900 mb-1 line-clamp-2 leading-tight">{stats.bottomSchool.name}</p>
+            <div className="text-emerald-700 font-bold text-xs">{stats.bottomSchool.count > 0 ? '+' : ''}{stats.bottomSchool.count} total</div>
           </div>
           <div className="bg-rose-50/40 p-4 rounded-xl border border-rose-100 shadow-sm">
             <span className="text-[9px] font-bold uppercase text-rose-700/60 block mb-1">Escola: Top Excedente</span>
-            <p className="text-[11px] font-bold text-slate-900 mb-1 line-clamp-2 leading-tight">{stats.bottomSchool.name}</p>
-            <div className="text-rose-700 font-bold text-xs">{stats.bottomSchool.count} total</div>
+            <p className="text-[11px] font-bold text-slate-900 mb-1 line-clamp-2 leading-tight">{stats.topSchool.name}</p>
+            <div className="text-rose-700 font-bold text-xs">{stats.topSchool.count > 0 ? '+' : ''}{stats.topSchool.count} total</div>
           </div>
         </div>
       </section>
