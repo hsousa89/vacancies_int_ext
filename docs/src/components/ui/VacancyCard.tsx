@@ -1,4 +1,4 @@
-import type { Vacancy } from '../hooks/useVacancies';
+import type { Vacancy } from '../../hooks/useVacancies';
 
 interface VacancyCardProps {
   vacancy: Vacancy;
@@ -6,9 +6,16 @@ interface VacancyCardProps {
 }
 
 export function VacancyCard({ vacancy, municipalitiesList }: VacancyCardProps) {
+  // Extract school code and name cleanly
+  const schoolCode = vacancy.school?.split(' - ')[0];
+  // Re-join the rest in case the school name naturally has hyphens in it
+  const schoolName = vacancy.school?.split(' - ').slice(1).join(' - ') || vacancy.school;
+  const concelhoName = vacancy.concelho?.split(' (')[0];
+
   return (
     <div className="p-4 bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col hover:shadow-md transition-shadow">
       
+      {/* Top Badges (QZP & Count) */}
       <div className="flex justify-between items-start gap-2 mb-3">
         <div className="flex-1 flex flex-col bg-blue-50 px-2.5 py-1.5 rounded-md min-w-0" title={`${vacancy.qzp}: ${municipalitiesList}`}>
           <span className="text-xs font-bold text-blue-800">{vacancy.qzp}</span>
@@ -27,16 +34,32 @@ export function VacancyCard({ vacancy, municipalitiesList }: VacancyCardProps) {
         </span>
       </div>
       
-      <h3 className="font-semibold text-slate-900 leading-tight mb-2 mt-1">
-        {vacancy.subjectGroup}
-      </h3>
+      {/* SWAPPED HIERARCHY: School Name is now primary */}
+      <div className="mb-3">
+        <h3 className="font-bold text-slate-900 leading-tight mb-1.5 text-lg">
+          {vacancy.type === 'Zone' 
+            ? '📍 Vagas de Quadro de Zona Pedagógica' 
+            : `🏫 ${schoolName}`
+          }
+        </h3>
+        
+        {/* School Code & Municipality */}
+        {vacancy.type === 'School' && (
+          <p className="text-xs text-slate-500 font-medium flex items-center gap-1.5">
+            <span className="font-mono bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded text-slate-700">
+              Cód: {schoolCode}
+            </span>
+            <span>• {concelhoName}</span>
+          </p>
+        )}
+      </div>
       
-      <p className="text-sm text-slate-500">
-        {vacancy.type === 'Zone' 
-          ? '📍 Vagas de Quadro de Zona Pedagógica' 
-          : `🏫 ${vacancy.school?.split(' - ')[1] || vacancy.school} • ${vacancy.concelho?.split(' (')[0]}`
-        }
-      </p>
+      {/* Subject Group is now a secondary badge at the bottom */}
+      <div className="mt-auto pt-3 border-t border-slate-100">
+        <p className="text-[11px] font-bold text-slate-600 bg-slate-50 border border-slate-200 inline-block px-2 py-1 rounded-md">
+          {vacancy.subjectGroup}
+        </p>
+      </div>
 
     </div>
   );
