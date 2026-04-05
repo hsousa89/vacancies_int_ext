@@ -1,5 +1,7 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { SearchableFilter } from '../components/ui/SearchableFilter';
+import { VacancyCard } from '../components/ui/VacancyCard';
 import { useVacancies } from '../hooks/useVacancies';
 
 export function Results() {
@@ -12,7 +14,7 @@ export function Results() {
   const selectedSubjects = searchParams.getAll('subject');
 
   // Local Filter States
-  const [selectedVacancyTypes, setSelectedVacancyTypes] = useState<string[]>([]); // NEW!
+  const [selectedVacancyTypes, setSelectedVacancyTypes] = useState<string[]>([]);
   const [selectedZones, setSelectedZones] = useState<string[]>([]);
   const [selectedConcelhos, setSelectedConcelhos] = useState<string[]>([]);
   const [selectedSchools, setSelectedSchools] = useState<string[]>([]);
@@ -21,25 +23,21 @@ export function Results() {
   const [concelhoQuery, setConcelhoQuery] = useState('');
   const [schoolQuery, setSchoolQuery] = useState('');
 
-  // Get baseline results based on URL
+  // 1. Get baseline results
   const baseResults = useMemo(() => {
     return flatResults.filter((vacancy) => {
-      const matchesScope = 
-        (scope === 'zone' && vacancy.type === 'Zone') || 
-        (scope === 'school' && vacancy.type === 'School');
-      
+      const matchesScope = (scope === 'zone' && vacancy.type === 'Zone') || (scope === 'school' && vacancy.type === 'School');
       const matchesSubject = selectedSubjects.length === 0 || selectedSubjects.includes(vacancy.subjectGroup);
-
       return matchesScope && matchesSubject;
     });
   }, [flatResults, scope, selectedSubjects]);
 
-  // Extract unique options for filter menus
+  // 2. Extract options for menus
   const availableZones = useMemo(() => Array.from(new Set(baseResults.map(v => v.qzp))).sort(), [baseResults]);
   const availableConcelhos = useMemo(() => Array.from(new Set(baseResults.map(v => v.concelho).filter(Boolean) as string[])).sort(), [baseResults]);
   const availableSchools = useMemo(() => Array.from(new Set(baseResults.map(v => v.school).filter(Boolean) as string[])).sort(), [baseResults]);
 
-  // Map out which Municipalities belong to which QZP for the badges
+  // 3. Map Municipalities to QZPs
   const qzpMunicipalityMap = useMemo(() => {
     const map: Record<string, Set<string>> = {};
     flatResults.forEach(v => {
@@ -49,57 +47,92 @@ export function Results() {
     return map;
   }, [flatResults]);
 
-  // Apply search text to checkbox lists
+  // Apply search text
   const filteredConcelhos = availableConcelhos.filter(c => c.toLowerCase().includes(concelhoQuery.toLowerCase()));
   const filteredSchools = availableSchools.filter(s => s.toLowerCase().includes(schoolQuery.toLowerCase()));
 
-  // Apply final filters to display cards
+  // 4. Final display results (WITH ADDITIVE "OR" LOGIC)
   const displayResults = useMemo(() => {
     return baseResults.filter(v => {
-      // 1. Vacancy Type Check (Positive, Negative, Zero)
       let matchVacancy = true;
       if (selectedVacancyTypes.length > 0) {
         const type = v.count > 0 ? 'positive' : v.count < 0 ? 'negative' : 'zero';
         matchVacancy = selectedVacancyTypes.includes(type);
       }
 
-      // 2. Geography Checks
-      const matchZone = selectedZones.length === 0 || selectedZones.includes(v.qzp);
-      const matchConcelho = selectedConcelhos.length === 0 || (v.concelho && selectedConcelhos.includes(v.concelho));
-      const matchSchool = selectedSchools.length === 0 || (v.school && selectedSchools.includes(v.school));
+      const hasGeoFilters = selectedZones.length > 0 || selectedConcelhos.length > 0 || selectedSchools.length > 0;
+      let matchGeo = true;
       
-      return matchVacancy && matchZone && matchConcelho && matchSchool;
+      if (hasGeoFilters) {
+        const inZone = selectedZones.includes(v.qzp);
+        const inConcelho = v.concelho ? selectedConcelhos.includes(v.concelho) : false;
+        const inSchool = v.school ? selectedSchools.includes(v.school) : false;
+        
+        matchGeo = inZone || inConcelho || inSchool;
+      }
+      
+      return matchVacancy && matchGeo;
     });
   }, [baseResults, selectedVacancyTypes, selectedZones, selectedConcelhos, selectedSchools]);
 
+  // Total Vacancies & Animation
+  const totalVacancies = useMemo(() => {
+    return displayResults.reduce((sum, v) => sum + v.count, 0);
+  }, [displayResults]);
+
+  const [highlight, setHighlight] = useState(false);
+
+  useEffect(() => {
+    setHighlight(true);
+    const timer = setTimeout(() => setHighlight(false), 400); 
+    return () => clearTimeout(timer);
+  }, [displayResults.length, totalVacancies]);
+
+  // --- NEW: DYNAMIC COLOR LOGIC FOR THE BADGE ---
+  let badgeColorClass = '';
+  if (totalVacancies > 0) {
+    badgeColorClass = highlight 
+      ? 'bg-emerald-200 text-emerald-900 scale-110 shadow-sm decoration-emerald-400' 
+      : 'bg-emerald-50 text-emerald-700 scale-100 decoration-emerald-400';
+  } else if (totalVacancies < 0) {
+    badgeColorClass = highlight 
+      ? 'bg-rose-200 text-rose-900 scale-110 shadow-sm decoration-rose-400' 
+      : 'bg-rose-50 text-rose-700 scale-100 decoration-rose-400';
+  } else {
+    badgeColorClass = highlight 
+      ? 'bg-slate-300 text-slate-900 scale-110 shadow-sm decoration-slate-400' 
+      : 'bg-slate-100 text-slate-600 scale-100 decoration-slate-300';
+  }
+
   // Helpers
-  const toggleSelection = (setter: React.Dispatch<React.SetStateAction<string[]>>, current: string[], value: string) => {
-    if (current.includes(value)) setter(current.filter(item => item !== value));
-    else setter([...current, value]);
+  const toggleState = (setter: React.Dispatch<React.SetStateAction<string[]>>, current: string[], value: string) => {
+    setter(current.includes(value) ? current.filter(i => i !== value) : [...current, value]);
   };
 
   const clearFilters = () => {
-    setSelectedVacancyTypes([]);
-    setSelectedZones([]);
-    setSelectedConcelhos([]);
-    setSelectedSchools([]);
-    setConcelhoQuery('');
-    setSchoolQuery('');
+    setSelectedVacancyTypes([]); setSelectedZones([]); setSelectedConcelhos([]); setSelectedSchools([]);
+    setConcelhoQuery(''); setSchoolQuery('');
   };
 
-  // Calculate total active filters for the notification badge
   const activeFiltersCount = selectedVacancyTypes.length + selectedZones.length + selectedConcelhos.length + selectedSchools.length;
 
   return (
     <div className="flex flex-col gap-4">
+      {/* Header */}
       <div className="flex items-center justify-between mb-2">
         <div>
-          <h2 className="text-2xl font-headline font-bold text-slate-900">
-            Resultados
-          </h2>
-          <p className="text-slate-500">
-            Encontrados {displayResults.length} registos correspondentes.
-          </p>
+          <h2 className="text-2xl font-headline font-bold text-slate-900">Resultados</h2>
+          
+          <div className="text-slate-500 flex items-center flex-wrap gap-1.5 mt-1">
+            Encontradas
+            <span 
+              key={`${displayResults.length}-${totalVacancies}`} 
+              className={`inline-flex items-center justify-center px-2 py-0.5 rounded font-bold text-sm transition-all duration-300 animate-in zoom-in-75 underline decoration-2 underline-offset-2 ${badgeColorClass}`}
+            >
+              {totalVacancies > 0 ? '+' : ''}{totalVacancies} vagas
+            </span>
+            em {displayResults.length} registos.
+          </div>
         </div>
         
         <button onClick={() => navigate(-1)} className="p-2 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors">
@@ -120,53 +153,32 @@ export function Results() {
           <summary className="p-4 font-semibold text-slate-800 cursor-pointer flex justify-between items-center list-none">
             <span className="flex items-center gap-2">
               <span className="material-symbols-outlined">filter_list</span>
-              Filtros Avançados {activeFiltersCount > 0 && 
-                <span className="bg-rose-600 text-white text-xs px-2 py-0.5 rounded-full">
-                  {activeFiltersCount}
-                </span>
-              }
+              Filtros Avançados {activeFiltersCount > 0 && <span className="bg-rose-600 text-white text-xs px-2 py-0.5 rounded-full">{activeFiltersCount}</span>}
             </span>
             <span className="material-symbols-outlined transition-transform group-open:rotate-180 text-slate-400">expand_more</span>
           </summary>
           
           <div className="p-4 border-t border-slate-100 flex flex-col gap-6">
-            
-            {/* NEW: Vacancy Type Filter */}
             <div>
               <h4 className="text-sm font-bold text-slate-700 mb-2">Disponibilidade</h4>
               <div className="flex flex-wrap gap-2">
                 {[
-                  { id: 'positive', label: 'Com vagas (+)', activeClass: 'bg-emerald-100 text-emerald-800 border-emerald-200' },
-                  { id: 'zero', label: 'Sem vagas (0)', activeClass: 'bg-slate-200 text-slate-800 border-slate-300' },
-                  { id: 'negative', label: 'Negativas (-)', activeClass: 'bg-rose-100 text-rose-800 border-rose-200' }
+                  { id: 'positive', label: 'Com vagas (+)', cls: 'bg-emerald-100 text-emerald-800 border-emerald-200' },
+                  { id: 'zero', label: 'Sem vagas (0)', cls: 'bg-slate-200 text-slate-800 border-slate-300' },
+                  { id: 'negative', label: 'Negativas (-)', cls: 'bg-rose-100 text-rose-800 border-rose-200' }
                 ].map(type => (
-                  <button
-                    key={type.id}
-                    onClick={() => toggleSelection(setSelectedVacancyTypes, selectedVacancyTypes, type.id)}
-                    className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
-                      selectedVacancyTypes.includes(type.id) 
-                        ? type.activeClass 
-                        : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-slate-300'
-                    }`}
-                  >
+                  <button key={type.id} onClick={() => toggleState(setSelectedVacancyTypes, selectedVacancyTypes, type.id)} className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${selectedVacancyTypes.includes(type.id) ? type.cls : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-slate-300'}`}>
                     {type.label}
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Existing: Zones */}
             <div>
               <h4 className="text-sm font-bold text-slate-700 mb-2">Zonas (QZP)</h4>
               <div className="flex flex-wrap gap-2">
                 {availableZones.map(zone => (
-                  <button
-                    key={zone}
-                    onClick={() => toggleSelection(setSelectedZones, selectedZones, zone)}
-                    className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
-                      selectedZones.includes(zone) ? 'bg-blue-100 text-blue-800 border-blue-200' : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-blue-300'
-                    }`}
-                  >
+                  <button key={zone} onClick={() => toggleState(setSelectedZones, selectedZones, zone)} className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${selectedZones.includes(zone) ? 'bg-blue-100 text-blue-800 border-blue-200' : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-blue-300'}`}>
                     {zone}
                   </button>
                 ))}
@@ -175,31 +187,8 @@ export function Results() {
 
             {scope === 'school' && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="flex flex-col gap-2">
-                  <h4 className="text-sm font-bold text-slate-700">Concelhos</h4>
-                  <input type="text" placeholder="Pesquisar concelho..." value={concelhoQuery} onChange={(e) => setConcelhoQuery(e.target.value)} className="px-3 py-1.5 text-sm border border-slate-200 rounded-md bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                  <div className="max-h-48 overflow-y-auto bg-slate-50 border border-slate-200 rounded-lg p-2 flex flex-col gap-1">
-                    {filteredConcelhos.length > 0 ? filteredConcelhos.map(concelho => (
-                      <label key={concelho} className="flex items-center gap-2 text-sm text-slate-700 p-1.5 hover:bg-slate-200 rounded cursor-pointer">
-                        <input type="checkbox" checked={selectedConcelhos.includes(concelho)} onChange={() => toggleSelection(setSelectedConcelhos, selectedConcelhos, concelho)} className="rounded border-slate-300 w-4 h-4" />
-                        {concelho}
-                      </label>
-                    )) : <p className="text-sm text-slate-400 p-2">Nenhum concelho encontrado.</p>}
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <h4 className="text-sm font-bold text-slate-700">Escolas</h4>
-                  <input type="text" placeholder="Pesquisar escola..." value={schoolQuery} onChange={(e) => setSchoolQuery(e.target.value)} className="px-3 py-1.5 text-sm border border-slate-200 rounded-md bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                  <div className="max-h-48 overflow-y-auto bg-slate-50 border border-slate-200 rounded-lg p-2 flex flex-col gap-1">
-                    {filteredSchools.length > 0 ? filteredSchools.map(school => (
-                      <label key={school} className="flex items-center gap-2 text-sm text-slate-700 p-1.5 hover:bg-slate-200 rounded cursor-pointer">
-                        <input type="checkbox" checked={selectedSchools.includes(school)} onChange={() => toggleSelection(setSelectedSchools, selectedSchools, school)} className="rounded border-slate-300 w-4 h-4 flex-shrink-0" />
-                        <span className="truncate" title={school}>{school}</span>
-                      </label>
-                    )) : <p className="text-sm text-slate-400 p-2">Nenhuma escola encontrada.</p>}
-                  </div>
-                </div>
+                <SearchableFilter title="Concelhos" placeholder="Pesquisar concelho..." query={concelhoQuery} onQueryChange={setConcelhoQuery} items={filteredConcelhos} selectedItems={selectedConcelhos} onToggle={(item) => toggleState(setSelectedConcelhos, selectedConcelhos, item)} emptyMessage="Nenhum concelho encontrado." />
+                <SearchableFilter title="Escolas" placeholder="Pesquisar escola..." query={schoolQuery} onQueryChange={setSchoolQuery} items={filteredSchools} selectedItems={selectedSchools} onToggle={(item) => toggleState(setSelectedSchools, selectedSchools, item)} emptyMessage="Nenhuma escola encontrada." />
               </div>
             )}
 
@@ -214,44 +203,13 @@ export function Results() {
 
       {/* RESULTS GRID */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-20">
-        {displayResults.map((vacancy) => {
-          const municipalitiesList = Array.from(qzpMunicipalityMap[vacancy.qzp] || []).join(', ');
-
-          return (
-            <div key={vacancy.id} className="p-4 bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col hover:shadow-md transition-shadow">
-              
-              <div className="flex justify-between items-start gap-2 mb-3">
-                <div className="flex-1 flex flex-col bg-blue-50 px-2.5 py-1.5 rounded-md min-w-0" title={`${vacancy.qzp}: ${municipalitiesList}`}>
-                  <span className="text-xs font-bold text-blue-800">{vacancy.qzp}</span>
-                  <span className="text-[10px] text-blue-600/80 truncate">
-                    {municipalitiesList || 'Sem concelhos'}
-                  </span>
-                </div>
-
-                <span className={`text-sm font-bold px-2.5 py-1.5 rounded-md whitespace-nowrap flex-shrink-0 ${
-                    vacancy.count > 0 ? 'bg-emerald-50 text-emerald-700' : 
-                    vacancy.count < 0 ? 'bg-rose-50 text-rose-700' : 
-                    'bg-slate-100 text-slate-600'
-                  }`}
-                >
-                  {vacancy.count > 0 ? '+' : ''}{vacancy.count} Vagas
-                </span>
-              </div>
-              
-              <h3 className="font-semibold text-slate-900 leading-tight mb-2 mt-1">
-                {vacancy.subjectGroup}
-              </h3>
-              
-              <p className="text-sm text-slate-500">
-                {vacancy.type === 'Zone' 
-                  ? '📍 Vagas de Quadro de Zona Pedagógica' 
-                  : `🏫 ${vacancy.school?.split(' - ')[1] || vacancy.school} • ${vacancy.concelho?.split(' (')[0]}`
-                }
-              </p>
-
-            </div>
-          );
-        })}
+        {displayResults.map((vacancy) => (
+          <VacancyCard 
+            key={vacancy.id} 
+            vacancy={vacancy} 
+            municipalitiesList={Array.from(qzpMunicipalityMap[vacancy.qzp] || []).join(', ')} 
+          />
+        ))}
       </div>
     </div>
   );
