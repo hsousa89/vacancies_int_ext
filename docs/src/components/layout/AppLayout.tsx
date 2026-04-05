@@ -1,4 +1,5 @@
 import { Outlet } from 'react-router-dom';
+import { VacancyProvider } from '../../hooks/useVacancies'; // Import the provider
 import { BottomNav } from './BottomNav';
 import { TopBar } from './TopBar';
 
@@ -7,10 +8,12 @@ export function AppLayout() {
     <div className="pb-24">
       <TopBar />
 
-      {/* Main Content Area (Pages inject here) */}
-      <main className="px-6 py-8">
-        <Outlet /> 
-      </main>
+      {/* Wrap the main content in the Provider */}
+      <VacancyProvider>
+        <main className="px-6 py-8">
+          <Outlet /> 
+        </main>
+      </VacancyProvider>
 
       <BottomNav />
     </div>
