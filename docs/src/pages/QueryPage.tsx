@@ -46,18 +46,18 @@ export function QueryPage() {
           onClick={() => setScope('zone')}
           className={`flex-1 py-3 rounded-lg font-headline font-bold text-sm transition-all ${searchScope === 'zone' ? 'bg-primary text-on-primary shadow-md' : 'text-on-surface-variant hover:bg-surface-container-low'}`}
         >
-          Concurso Externo (Vagas QZP)
+          Vagas de Quadro de Zona Pedagógica (QZP)
         </button>
         <button 
           onClick={() => setScope('school')}
           className={`flex-1 py-3 rounded-lg font-headline font-bold text-sm transition-all ${searchScope === 'school' ? 'bg-primary text-on-primary shadow-md' : 'text-on-surface-variant hover:bg-surface-container-low'}`}
         >
-          Concurso Interno (Vagas QA/ENA)
+          Vagas de Quadro de Escola ou Escola Não Agrupada (QA/ENA)
         </button>
       </div>
 
       <div className="mb-6">
-        <h3 className="font-headline text-lg font-bold mb-3">Target Subjects</h3>
+        <h3 className="font-headline text-lg font-bold mb-3">Grupo(s) de Recrutamento que vai concorrer</h3>
         <div className="flex flex-wrap gap-2">
           {allSubjects.map((sub) => (
             <button
@@ -99,7 +99,7 @@ export function QueryPage() {
             className="h-14 px-6 rounded-full bg-gradient-to-br from-primary to-primary-container text-on-primary shadow-lg shadow-primary/20 flex items-center justify-center gap-2 transform hover:scale-105 transition-all font-bold"
           >
             <span className="material-symbols-outlined" style={{fontVariationSettings: "'FILL' 1"}}>manage_search</span>
-            Run Query
+            Pesquisar
           </button>
         </div>
       )}
