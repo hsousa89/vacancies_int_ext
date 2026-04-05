@@ -7,7 +7,7 @@ export function TopBar() {
             <span className="material-symbols-outlined text-slate-500">menu</span>
           </button>
           <h1 className="font-headline font-extrabold tracking-tight text-xl text-slate-900">
-            Precision Editorial
+            Profs PT
           </h1>
         </div>
         {/* User Profile Avatar Placeholder */}
