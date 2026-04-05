@@ -7,12 +7,12 @@ export function QueryPage() {
   const navigate = useNavigate();
   const { getAvailableSubjects } = useVacancies();
   
-  // URL State
-  const searchScope = searchParams.get('scope') || 'zone';
+  // 1. Define the scope first, enforcing it as 'zone' | 'school' for TypeScript
+  const searchScope = (searchParams.get('scope') as 'zone' | 'school') || 'zone';
   const selectedSubjects = searchParams.getAll('subject');
 
-  // Load subjects dynamically from your JSON
-  const allSubjects = getAvailableSubjects();
+  // 2. Pass the scope into the function!
+  const allSubjects = getAvailableSubjects(searchScope);
 
   const setScope = (scope: 'zone' | 'school') => {
     searchParams.set('scope', scope);
@@ -37,8 +37,8 @@ export function QueryPage() {
   return (
     <div className="animate-in fade-in duration-300">
       <div className="mb-8">
-        <h2 className="font-headline text-3xl font-extrabold tracking-tight">Placement Query</h2>
-        <p className="text-secondary font-medium mt-1">Define your search scope and targets.</p>
+        <h2 className="font-headline text-3xl font-extrabold tracking-tight">Procurar Vagas</h2>
+        <p className="text-secondary font-medium mt-1">Defina o tipo de candidatura e o(s) Grupo(s) de Recrutamento que vai concorrer.</p>
       </div>
 
       <div className="mb-8 bg-surface-container-lowest p-2 rounded-xl flex gap-2 shadow-sm border border-surface-container-high">
@@ -46,32 +46,46 @@ export function QueryPage() {
           onClick={() => setScope('zone')}
           className={`flex-1 py-3 rounded-lg font-headline font-bold text-sm transition-all ${searchScope === 'zone' ? 'bg-primary text-on-primary shadow-md' : 'text-on-surface-variant hover:bg-surface-container-low'}`}
         >
-          Zone Aggregates (Macro)
+          Concurso Externo (Vagas QZP)
         </button>
         <button 
           onClick={() => setScope('school')}
           className={`flex-1 py-3 rounded-lg font-headline font-bold text-sm transition-all ${searchScope === 'school' ? 'bg-primary text-on-primary shadow-md' : 'text-on-surface-variant hover:bg-surface-container-low'}`}
         >
-          School Tenders (Micro)
+          Concurso Interno (Vagas QA/ENA)
         </button>
       </div>
 
       <div className="mb-6">
         <h3 className="font-headline text-lg font-bold mb-3">Target Subjects</h3>
         <div className="flex flex-wrap gap-2">
-          {allSubjects.map(sub => (
+          {allSubjects.map((sub) => (
             <button
               key={sub.id}
-              onClick={() => toggleSubject(sub.id)}
+              // Prevent clicking if it's disabled
+              onClick={() => !sub.isDisabled && toggleSubject(sub.id)}
+              disabled={sub.isDisabled}
               className={`px-4 py-2 rounded-full text-sm font-medium border flex items-center gap-2 transition-colors ${
-                selectedSubjects.includes(sub.id) 
-                  ? 'bg-primary-fixed text-on-primary-fixed border-transparent' 
-                  : 'bg-surface-container-lowest text-on-surface-variant border-surface-container-high hover:border-primary/50'
+                sub.isDisabled
+                  ? 'bg-slate-50 text-slate-400 border-slate-200 cursor-not-allowed opacity-60' // Disabled styling
+                  : selectedSubjects.includes(sub.id) 
+                  ? 'bg-primary-fixed text-on-primary-fixed border-transparent' // Selected styling
+                  : 'bg-surface-container-lowest text-on-surface-variant border-surface-container-high hover:border-primary/50' // Default styling
               }`}
             >
-              <span className="opacity-60 text-xs font-bold mr-1">{sub.code}</span>
+              <span className={`text-xs font-bold mr-1 ${sub.isDisabled ? 'opacity-50' : 'opacity-60'}`}>
+                {sub.code}
+              </span>
               {sub.name}
-              {selectedSubjects.includes(sub.id) && <span className="material-symbols-outlined text-[16px]">check</span>}
+              
+              {/* Optional: Show the total vacancy count in parenthesis so they know WHY it's disabled */}
+              <span className="text-xs ml-1 opacity-50">
+                ({sub.totalVacancies})
+              </span>
+
+              {selectedSubjects.includes(sub.id) && !sub.isDisabled && (
+                <span className="material-symbols-outlined text-[16px]">check</span>
+              )}
             </button>
           ))}
         </div>
