@@ -78,13 +78,17 @@ export function QueryPage() {
               </span>
               {sub.name}
               
-              {/* Optional: Show the total vacancy count in parenthesis so they know WHY it's disabled */}
-              <span className="text-xs ml-1 opacity-50">
-                ({sub.totalVacancies})
+              <span className={`text-xs ml-1 ${
+                sub.totalVacancies < 0 
+                  ? 'text-rose-400 font-bold opacity-50': sub.totalVacancies === 0
+                  ? 'text-slate-400 font-medium' // Clean grey for exactly 0
+                  : 'text-emerald-900 font-bold opacity-50'
+              }`}>
+                ({sub.totalVacancies > 0 ? '+' : ''}{sub.totalVacancies})
               </span>
 
               {selectedSubjects.includes(sub.id) && !sub.isDisabled && (
-                <span className="material-symbols-outlined text-[16px]">check</span>
+                <span className="material-symbols-outlined text-[16px] text-emerald-900">check</span>
               )}
             </button>
           ))}
