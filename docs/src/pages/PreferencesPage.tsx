@@ -47,7 +47,9 @@ export function PreferencesPage() {
 
       <div className="flex flex-col gap-3 mb-10">
         {preferences.map((vacancy, index) => {
+          const schoolCode = vacancy.school?.split(' - ')[0];
           const schoolName = vacancy.school?.split(' - ').slice(1).join(' - ') || vacancy.school;
+          const concelhoName = vacancy.concelho?.split(' (')[0];
           const isFirst = index === 0;
           const isLast = index === preferences.length - 1;
 
@@ -67,9 +69,17 @@ export function PreferencesPage() {
                     {vacancy.subjectGroup.split(' - ')[0]}
                   </span>
                 </div>
-                <h4 className="font-bold text-slate-900 text-sm sm:text-base leading-tight truncate">
+                <h4 className="font-bold text-slate-900 m-2 text-sm sm:text-base leading-tight truncate">
                   {vacancy.type === 'Zone' ? 'Quadro de Zona Pedagógica' : schoolName}
                 </h4>
+                {vacancy.type === 'School' && (
+                  <p className="text-xs text-slate-500 font-medium flex items-center gap-1.5">
+                    <span className="font-mono bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded text-slate-700">
+                      Cód: {schoolCode}
+                    </span>
+                    <span>• {concelhoName}</span>
+                  </p>
+                )}
               </div>
 
               {/* Action Buttons */}
