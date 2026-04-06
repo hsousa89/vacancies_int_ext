@@ -119,11 +119,15 @@ export function Results() {
   return (
     <div className="flex flex-col gap-4">
       {/* Header */}
-      <div className="flex items-center justify-between mb-2">
+      <div className="mb-6 pt-4 flex items-start justify-between">
         <div>
-          <h2 className="text-2xl font-headline font-bold text-slate-900">Resultados</h2>
+          <p className="text-primary font-label text-sm font-bold tracking-wide uppercase flex items-center gap-1.5 mb-1">
+            <span className="material-symbols-outlined text-[16px]">list_alt</span>
+            Lista de Vagas
+          </p>
+          <h2 className="text-3xl font-headline font-extrabold text-slate-900 leading-tight">Resultados da Pesquisa</h2>
           
-          <div className="text-slate-500 flex items-center flex-wrap gap-1.5 mt-1">
+          <div className="text-slate-500 text-sm flex items-center flex-wrap gap-1.5 mt-1">
             Encontradas
             <span 
               key={`${displayResults.length}-${totalVacancies}`} 
@@ -131,11 +135,11 @@ export function Results() {
             >
               {totalVacancies > 0 ? '+' : ''}{totalVacancies} vagas
             </span>
-            em {displayResults.length} registos.
+            em {displayResults.length} registos correspondentes.
           </div>
         </div>
         
-        <button onClick={() => navigate(-1)} className="p-2 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors">
+        <button onClick={() => navigate(-1)} className="p-2 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors mt-2">
           <span className="material-symbols-outlined">arrow_back</span>
         </button>
       </div>

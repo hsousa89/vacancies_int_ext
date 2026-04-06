@@ -37,7 +37,7 @@ export function PreferencesPage() {
   return (
     <div className="max-w-4xl mx-auto animate-in fade-in duration-300">
       <div className="mb-6">
-        <p className="text-amber-600 font-label text-sm font-bold tracking-wide uppercase flex items-center gap-1.5 mb-1">
+        <p className="text-primary font-label text-sm font-bold tracking-wide uppercase flex items-center gap-1.5 mb-1">
           <span className="material-symbols-outlined text-[16px]">bookmarks</span>
           As Minhas Escolhas
         </p>
@@ -54,10 +54,10 @@ export function PreferencesPage() {
           const isLast = index === preferences.length - 1;
 
           return (
-            <div key={vacancy.id} className="bg-white rounded-xl border border-slate-200 p-3 sm:p-4 shadow-sm flex items-center gap-3 sm:gap-4 transition-all hover:shadow-md hover:border-amber-200 group">
+            <div key={vacancy.id} className="bg-white rounded-xl border border-slate-200 p-3 sm:p-4 shadow-sm flex items-center gap-3 sm:gap-4 transition-all hover:shadow-md hover:border-primary group">
               
               {/* Order Badge */}
-              <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 bg-amber-100 text-amber-700 rounded-lg flex items-center justify-center font-bold text-lg border border-amber-200">
+              <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 bg-primary/60 text-on-primary rounded-lg flex items-center justify-center font-bold text-lg border border-primary">
                 {index + 1}
               </div>
 

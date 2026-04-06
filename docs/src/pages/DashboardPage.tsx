@@ -8,7 +8,7 @@ export function Dashboard() {
   return (
     <div className="max-w-7xl mx-auto animate-in fade-in duration-500 pb-12 px-4">
       <div className="mb-6 pt-4">
-        <p className="text-emerald-600 font-label text-sm font-bold tracking-wide uppercase flex items-center gap-1.5 mb-1">
+        <p className="text-primary font-label text-sm font-bold tracking-wide uppercase flex items-center gap-1.5 mb-1">
           <span className="material-symbols-outlined text-[16px]">bar_chart</span>
           Panorama Nacional 2026
         </p>
