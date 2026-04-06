@@ -1,6 +1,7 @@
 import { Route, Routes } from 'react-router-dom';
 import { AppLayout } from './components/layout/AppLayout';
 import { PreferencesProvider } from './hooks/usePreferences';
+import { LocationProvider } from './hooks/useUserLocation';
 import { VacancyProvider } from './hooks/useVacancies';
 import { Dashboard } from './pages/DashboardPage';
 import { PreferencesPage } from './pages/PreferencesPage';
@@ -11,14 +12,16 @@ export default function App() {
   return (
     <VacancyProvider>
       <PreferencesProvider>
-        <Routes>
-          <Route element={<AppLayout />}>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/query" element={<QueryPage />} />
-            <Route path="/results" element={<Results />} />
-            <Route path="/preferences" element={<PreferencesPage />} />
-          </Route>
-        </Routes>
+        <LocationProvider>
+          <Routes>
+            <Route element={<AppLayout />}>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/query" element={<QueryPage />} />
+              <Route path="/results" element={<Results />} />
+              <Route path="/preferences" element={<PreferencesPage />} />
+            </Route>
+          </Routes>
+        </LocationProvider>
       </PreferencesProvider>
     </VacancyProvider>
   );

@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
+import { LocationBanner } from '../components/ui/LocationBanner';
 import { SearchableFilter } from '../components/ui/SearchableFilter';
 import { VacancyCard } from '../components/ui/VacancyCard';
 import { usePreferences } from '../hooks/usePreferences';
@@ -12,7 +13,7 @@ export function Results() {
   const { flatResults, qzpMunicipalityMap } = useVacancies();
   const { preferences, toggleMultiplePreferences } = usePreferences();
   const filters = useResultsFilters(flatResults);
-  const { userLocation, isLocating, locationError, requestLocation, calculateDistance } = useUserLocation();
+  const { calculateDistance } = useUserLocation();
 
   const isAllSaved = filters.displayResults.length > 0 && 
     filters.displayResults.every(v => preferences.some(p => p.id === v.id));
@@ -129,24 +130,9 @@ export function Results() {
         </details>
       )}
 
-      {/* NEW: GEOLOCATION BANNER */}
-      {filters.scope === 'school' && filters.displayResults.length > 0 && !userLocation && (
-        <div className="bg-primary/5 border border-primary/20 p-4 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4 mb-2">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center flex-shrink-0">
-              <span className="material-symbols-outlined">location_on</span>
-            </div>
-            <div>
-              <p className="text-sm font-bold text-slate-900">Ver distâncias até às escolas?</p>
-              <p className="text-xs text-slate-600 mt-0.5">
-                {locationError ? <span className="text-rose-600">{locationError}</span> : "Ative a localização para ver a distância exata até cada agrupamento."}
-              </p>
-            </div>
-          </div>
-          <Button variant="outline" onClick={requestLocation} disabled={isLocating} className="w-full sm:w-auto text-xs py-2">
-            {isLocating ? 'A obter...' : 'Permitir Localização'}
-          </Button>
-        </div>
+      {/* GEOLOCATION BANNER */}
+      {filters.scope === 'school' && filters.displayResults.length > 0 && (
+        <LocationBanner />
       )}
 
       {/* MODULARIZED RESULTS GRID */}

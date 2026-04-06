@@ -1,4 +1,5 @@
 import { usePreferences } from '../../hooks/usePreferences';
+import { useUserLocation } from '../../hooks/useUserLocation';
 import type { Vacancy } from '../../hooks/useVacancies';
 import { useVacancies } from '../../hooks/useVacancies';
 import { parseConcelho, parseSchool } from '../../utils/formatters';
@@ -9,17 +10,20 @@ interface VacancyCardProps {
   calculateDistance?: (lat: number | null, lon: number | null) => number | null;
 }
 
-export function VacancyCard({ vacancy, municipalitiesList, calculateDistance }: VacancyCardProps) {
+export function VacancyCard({ vacancy, municipalitiesList }: VacancyCardProps) {
   const { getSchoolMetadata } = useVacancies();
   const { code: schoolCode, name: schoolName } = parseSchool(vacancy.school);
   const concelhoName = parseConcelho(vacancy.concelho).name;
   const { preferences, togglePreference } = usePreferences();
+  const { calculateDistance, setManualLocation, userLocation } = useUserLocation();
   const isBookmarked = preferences.some(p => p.id === vacancy.id);
 
   const schoolMeta = vacancy.type === 'School' ? getSchoolMetadata(vacancy.concelho, vacancy.school) : null;
   
   const distanceKm = schoolMeta && calculateDistance ? calculateDistance(schoolMeta.school_latitude, schoolMeta.school_longitude) : null;
-  
+  const isThisBase = userLocation?.lat === schoolMeta?.school_latitude && userLocation?.lon === schoolMeta?.school_longitude;
+
+
   return (
     <div className="p-4 bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col hover:shadow-md transition-shadow">
       
@@ -77,33 +81,53 @@ export function VacancyCard({ vacancy, municipalitiesList, calculateDistance }: 
               <span>• {concelhoName}</span>
             </p>
 
-            {distanceKm !== null && (
+            {distanceKm !== null && !isThisBase && (
               <p className="text-xs text-slate-500 font-medium flex items-center gap-1">
                 <span className="material-symbols-outlined text-[14px] text-primary">directions_car</span>
                 Aprox. <strong className="text-slate-700">{distanceKm.toFixed(1)} km</strong> de distância
               </p>
             )}
+            {isThisBase && (
+              <p className="text-xs text-emerald-600 font-bold flex items-center gap-1">
+                <span className="material-symbols-outlined text-[14px]">push_pin</span>
+                A usar como ponto de partida
+              </p>
+            )}
           </div>
         )}
       </div>
-      
-      {/* Footer Area */}
+
+      {/* Footer Area with new Pin Action */}
       <div className="mt-auto pt-3 border-t border-slate-100 flex items-center justify-between">
         <p className="text-[11px] font-bold text-slate-600 bg-slate-50 border border-slate-200 inline-block px-2 py-1 rounded-md max-w-[70%] truncate">
           {vacancy.subjectGroup}
         </p>
 
-        {schoolMeta?.school_maps_place_url && (
-          <a 
-            href={schoolMeta.school_maps_place_url} 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="flex items-center justify-center p-1.5 rounded-full bg-slate-50 text-slate-400 hover:bg-blue-50 hover:text-blue-600 transition-colors"
-            title="Ver no Google Maps"
-          >
-            <span className="material-symbols-outlined text-[18px]">map</span>
-          </a>
-        )}
+        <div className="flex items-center gap-1">
+          {/* NEW: Set as Base Location Button */}
+          {schoolMeta?.school_latitude && schoolMeta?.school_longitude && (
+            <button 
+              onClick={() => setManualLocation(schoolMeta.school_latitude!, schoolMeta.school_longitude!, schoolName)}
+              className={`flex items-center justify-center p-1.5 rounded-full transition-colors ${isThisBase ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-50 text-slate-400 hover:bg-emerald-50 hover:text-emerald-600'}`}
+              title={isThisBase ? "Este é o ponto de partida atual" : "Usar como ponto de partida"}
+            >
+              <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: isThisBase ? "'FILL' 1" : "'FILL' 0" }}>push_pin</span>
+            </button>
+          )}
+
+          {/* Existing Google Maps Button */}
+          {schoolMeta?.school_maps_place_url && (
+            <a 
+              href={schoolMeta.school_maps_place_url} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-center justify-center p-1.5 rounded-full bg-slate-50 text-slate-400 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+              title="Ver no Google Maps"
+            >
+              <span className="material-symbols-outlined text-[18px]">map</span>
+            </a>
+          )}
+        </div>
       </div>
     </div>
   );
