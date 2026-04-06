@@ -1,7 +1,11 @@
 import { useNavigate } from 'react-router-dom';
 import { usePreferences } from '../hooks/usePreferences';
+import { useVacancies } from '../hooks/useVacancies';
+import { parseConcelho, parseSchool } from '../utils/formatters';
+
 
 export function PreferencesPage() {
+  const { qzpMunicipalityMap } = useVacancies();
   const { preferences, reorderPreferences, removePreference } = usePreferences();
   const navigate = useNavigate();
 
@@ -47,9 +51,9 @@ export function PreferencesPage() {
 
       <div className="flex flex-col gap-3 mb-10">
         {preferences.map((vacancy, index) => {
-          const schoolCode = vacancy.school?.split(' - ')[0];
-          const schoolName = vacancy.school?.split(' - ').slice(1).join(' - ') || vacancy.school;
-          const concelhoName = vacancy.concelho?.split(' (')[0];
+          const { code: schoolCode, name: schoolName } = parseSchool(vacancy.school)
+          const concelhoName = parseConcelho(vacancy.concelho);
+          const municipalList = qzpMunicipalityMap[vacancy.qzp];
           const isFirst = index === 0;
           const isLast = index === preferences.length - 1;
 
@@ -72,6 +76,13 @@ export function PreferencesPage() {
                 <h4 className="font-bold text-slate-900 m-2 text-sm sm:text-base leading-tight truncate">
                   {vacancy.type === 'Zone' ? 'Quadro de Zona Pedagógica' : schoolName}
                 </h4>
+                {vacancy.type === 'Zone' && (
+                  <p className="text-xs text-slate-500 font-medium flex items-center gap-1.5">
+                    <span className="font-mono bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded text-slate-700">
+                      {municipalList}
+                    </span>
+                  </p>
+                )}
                 {vacancy.type === 'School' && (
                   <p className="text-xs text-slate-500 font-medium flex items-center gap-1.5">
                     <span className="font-mono bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded text-slate-700">
