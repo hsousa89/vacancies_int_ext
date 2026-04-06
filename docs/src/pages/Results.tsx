@@ -1,3 +1,4 @@
+import { useCallback } from 'react'; // NEW
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { LocationBanner } from '../components/ui/LocationBanner';
@@ -6,14 +7,25 @@ import { VacancyCard } from '../components/ui/VacancyCard';
 import { usePreferences } from '../hooks/usePreferences';
 import { useResultsFilters } from '../hooks/useResultsFilters';
 import { useUserLocation } from '../hooks/useUserLocation';
+import type { Vacancy } from '../hooks/useVacancies'; // NEW
 import { useVacancies } from '../hooks/useVacancies';
 
 export function Results() {
   const navigate = useNavigate();
-  const { flatResults, qzpMunicipalityMap } = useVacancies();
+  const { flatResults, qzpMunicipalityMap, getSchoolMetadata } = useVacancies(); // NEW: Extracted getSchoolMetadata
   const { preferences, toggleMultiplePreferences } = usePreferences();
-  const filters = useResultsFilters(flatResults);
-  const { calculateDistance } = useUserLocation();
+  const { userLocation, calculateDistance } = useUserLocation();
+
+  // NEW: Create a pure callback to calculate distance for the filter hook
+  const getDistance = useCallback((vacancy: Vacancy) => {
+    if (vacancy.type !== 'School' || !userLocation) return null;
+    const meta = getSchoolMetadata(vacancy.concelho, vacancy.school);
+    if (!meta?.school_latitude || !meta?.school_longitude) return null;
+    return calculateDistance(meta.school_latitude, meta.school_longitude);
+  }, [userLocation, getSchoolMetadata, calculateDistance]);
+
+  // NEW: Pass the callback into the hook
+  const filters = useResultsFilters(flatResults, getDistance);
 
   const isAllSaved = filters.displayResults.length > 0 && 
     filters.displayResults.every(v => preferences.some(p => p.id === v.id));
@@ -88,6 +100,58 @@ export function Results() {
           </summary>
           
           <div className="p-4 border-t border-slate-100 flex flex-col gap-6">
+            
+            {/* NEW: DISTANCE SLIDER (Only for schools) */}
+            {filters.scope === 'school' && (
+              <div className="bg-slate-50 border border-slate-100 p-4 rounded-xl">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="text-sm font-bold text-slate-700 flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-[16px]">share_location</span>
+                    Raio de Distância
+                  </h4>
+                  {filters.maxDistance && (
+                    <span className="text-xs font-bold bg-primary text-white px-2 py-0.5 rounded-md">
+                      Até {filters.maxDistance} km
+                    </span>
+                  )}
+                </div>
+
+                {!userLocation ? (
+                  <p className="text-xs text-slate-500 flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-[14px] text-amber-500">warning</span>
+                    Ative a localização no banner abaixo para filtrar por distância.
+                  </p>
+                ) : (
+                  <div className="flex flex-col gap-1 mt-3 px-1">
+                    <input
+                      type="range"
+                      min="5"
+                      max="200"
+                      step="5"
+                      value={filters.maxDistance || 200}
+                      onChange={(e) => filters.setMaxDistance(Number(e.target.value))}
+                      className="w-full accent-primary h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer"
+                    />
+                    <div className="flex justify-between text-[10px] text-slate-400 font-bold px-1 mt-1">
+                      <span>5 km</span>
+                      <span>50 km</span>
+                      <span>100 km</span>
+                      <span>200 km</span>
+                    </div>
+                    {filters.maxDistance && (
+                      <div className="flex justify-end mt-2">
+                         <button 
+                           onClick={() => filters.setMaxDistance(null)} 
+                           className="text-xs text-rose-500 font-medium hover:text-rose-600 underline"
+                         >
+                           Remover limite
+                         </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
             <div>
               <h4 className="text-sm font-bold text-slate-700 mb-2">Disponibilidade</h4>
               <div className="flex flex-wrap gap-2">

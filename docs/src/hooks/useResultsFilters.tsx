@@ -1,24 +1,28 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { parseConcelho } from '../utils/formatters';
+import type { FilterOption } from '../components/ui/SearchableFilter';
+import { parseConcelho, parseSchool } from '../utils/formatters';
 import type { Vacancy } from './useVacancies';
 
-export function useResultsFilters(flatResults: Vacancy[]) {
+export function useResultsFilters(
+  flatResults: Vacancy[],
+  getDistance?: (vacancy: Vacancy) => number | null
+) {
   const [searchParams] = useSearchParams();
   const scope = searchParams.get('scope') || 'zone';
   const selectedSubjects = searchParams.getAll('subject');
 
-  // Local Filter States
   const [selectedVacancyTypes, setSelectedVacancyTypes] = useState<string[]>([]);
   const [selectedZones, setSelectedZones] = useState<string[]>([]);
+  
+
   const [selectedConcelhos, setSelectedConcelhos] = useState<string[]>([]);
   const [selectedSchools, setSelectedSchools] = useState<string[]>([]);
-
-  // Search Queries
+  
+  const [maxDistance, setMaxDistance] = useState<number | null>(null);
   const [concelhoQuery, setConcelhoQuery] = useState('');
   const [schoolQuery, setSchoolQuery] = useState('');
 
-  // 1. Baseline filtering
   const baseResults = useMemo(() => {
     return flatResults.filter((vacancy) => {
       const matchesScope = (scope === 'zone' && vacancy.type === 'Zone') || (scope === 'school' && vacancy.type === 'School');
@@ -27,15 +31,37 @@ export function useResultsFilters(flatResults: Vacancy[]) {
     });
   }, [flatResults, scope, selectedSubjects]);
 
-  // 2. Options for dropdowns
   const availableZones = useMemo(() => Array.from(new Set(baseResults.map(v => v.qzp))).sort(), [baseResults]);
-  const availableConcelhos = useMemo(() => Array.from(new Set(baseResults.map(v => parseConcelho(v.concelho).name).filter(Boolean))).sort(), [baseResults]);
-  const availableSchools = useMemo(() => Array.from(new Set(baseResults.map(v => v.school).filter(Boolean) as string[])).sort(), [baseResults]);
 
-  const filteredConcelhos = availableConcelhos.filter(c => c.toLowerCase().includes(concelhoQuery.toLowerCase()));
-  const filteredSchools = availableSchools.filter(s => s.toLowerCase().includes(schoolQuery.toLowerCase()));
+  // Generate robust { id: code, label: name } arrays
+  const availableConcelhos = useMemo<FilterOption[]>(() => {
+    const map = new Map<string, string>();
+    baseResults.forEach(v => {
+      if (!v.concelho) return;
+      const parsed = parseConcelho(v.concelho);
+      if (parsed?.code && parsed?.name) map.set(parsed.code, parsed.name);
+    });
+    return Array.from(map.entries())
+      .map(([id, label]) => ({ id, label }))
+      .sort((a, b) => a.label.localeCompare(b.label));
+  }, [baseResults]);
 
-  // 3. Final Display Results (Additive OR Logic)
+  const availableSchools = useMemo<FilterOption[]>(() => {
+    const map = new Map<string, string>();
+    baseResults.forEach(v => {
+      if (!v.school) return;
+      const parsed = parseSchool(v.school);
+      if (parsed?.code && parsed?.name) map.set(parsed.code, parsed.name);
+    });
+    return Array.from(map.entries())
+      .map(([id, label]) => ({ id, label }))
+      .sort((a, b) => a.label.localeCompare(b.label));
+  }, [baseResults]);
+
+  // Filter based on the label, but keep the structure intact
+  const filteredConcelhos = availableConcelhos.filter(c => c.label.toLowerCase().includes(concelhoQuery.toLowerCase()));
+  const filteredSchools = availableSchools.filter(s => s.label.toLowerCase().includes(schoolQuery.toLowerCase()));
+
   const displayResults = useMemo(() => {
     return baseResults.filter(v => {
       let matchVacancy = true;
@@ -49,15 +75,26 @@ export function useResultsFilters(flatResults: Vacancy[]) {
       
       if (hasGeoFilters) {
         const inZone = selectedZones.includes(v.qzp);
-        const inConcelho = v.concelho ? selectedConcelhos.includes(v.concelho) : false;
-        const inSchool = v.school ? selectedSchools.includes(v.school) : false;
+        
+        const concelhoCode = v.concelho ? parseConcelho(v.concelho)?.code : null;
+        const schoolCode = v.school ? parseSchool(v.school)?.code : null;
+        
+        const inConcelho = concelhoCode ? selectedConcelhos.includes(concelhoCode) : false;
+        const inSchool = schoolCode ? selectedSchools.includes(schoolCode) : false;
+        
         matchGeo = inZone || inConcelho || inSchool;
       }
-      return matchVacancy && matchGeo;
-    });
-  }, [baseResults, selectedVacancyTypes, selectedZones, selectedConcelhos, selectedSchools]);
 
-  // Total Vacancies & Animation Highlight
+      let matchDistance = true;
+      if (maxDistance !== null && getDistance) {
+        const dist = getDistance(v);
+        matchDistance = dist !== null && dist <= maxDistance; 
+      }
+
+      return matchVacancy && matchGeo && matchDistance;
+    });
+  }, [baseResults, selectedVacancyTypes, selectedZones, selectedConcelhos, selectedSchools, maxDistance, getDistance]);
+
   const totalVacancies = useMemo(() => displayResults.reduce((sum, v) => sum + v.count, 0), [displayResults]);
   const [highlight, setHighlight] = useState(false);
 
@@ -67,7 +104,6 @@ export function useResultsFilters(flatResults: Vacancy[]) {
     return () => clearTimeout(timer);
   }, [displayResults.length, totalVacancies]);
 
-  // Toggle Helpers
   const toggleList = (setter: any, list: string[], item: string) => setter(list.includes(item) ? list.filter((i: string) => i !== item) : [...list, item]);
 
   return {
@@ -76,25 +112,26 @@ export function useResultsFilters(flatResults: Vacancy[]) {
     displayResults,
     totalVacancies,
     highlight,
-    activeFiltersCount: selectedVacancyTypes.length + selectedZones.length + selectedConcelhos.length + selectedSchools.length,
+    activeFiltersCount: selectedVacancyTypes.length + selectedZones.length + selectedConcelhos.length + selectedSchools.length + (maxDistance !== null ? 1 : 0),
     
-    // UI Filter Data
     availableZones,
     filteredConcelhos,
-    filteredSchools,
+    filteredSchools,  
+    
     concelhoQuery, setConcelhoQuery,
     schoolQuery, setSchoolQuery,
     selectedVacancyTypes, selectedZones, selectedConcelhos, selectedSchools,
     baseResultsCount: baseResults.length,
+    
+    maxDistance, setMaxDistance,
 
-    // Actions
     toggleVacancyType: (t: string) => toggleList(setSelectedVacancyTypes, selectedVacancyTypes, t),
     toggleZone: (z: string) => toggleList(setSelectedZones, selectedZones, z),
     toggleConcelho: (c: string) => toggleList(setSelectedConcelhos, selectedConcelhos, c),
     toggleSchool: (s: string) => toggleList(setSelectedSchools, selectedSchools, s),
     clearFilters: () => {
       setSelectedVacancyTypes([]); setSelectedZones([]); setSelectedConcelhos([]); setSelectedSchools([]);
-      setConcelhoQuery(''); setSchoolQuery('');
+      setConcelhoQuery(''); setSchoolQuery(''); setMaxDistance(null);
     }
   };
 }
