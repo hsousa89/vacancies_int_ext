@@ -106,6 +106,16 @@ export function PreferencesPage() {
   const { preferences, reorderPreferences, removePreference, moveToPosition, sortPreferences } = usePreferences();
   const navigate = useNavigate();
 
+  // Local state to toggle type sorting direction
+  const [typeSortOrder, setTypeSortOrder] = useState<'zone' | 'school'>('zone');
+
+  const handleTypeSort = () => {
+    // Toggle the state and sort
+    const nextOrder = typeSortOrder === 'zone' ? 'school' : 'zone';
+    setTypeSortOrder(nextOrder);
+    sortPreferences(`type-${nextOrder}`);
+  };
+
   if (preferences.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-[70vh] text-center animate-in fade-in zoom-in-95 duration-500">
@@ -137,8 +147,15 @@ export function PreferencesPage() {
 
         {/* AUTOMATIC SORTING BUTTONS */}
         <div className="flex items-center gap-2 bg-slate-100 p-1.5 rounded-lg border border-slate-200 w-fit">
-          <button onClick={() => sortPreferences('type')} title="Agrupar por Tipo (QZP / Escola)" className="px-3 py-1.5 text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-white rounded shadow-sm transition-all flex items-center gap-1">
-            <span className="material-symbols-outlined text-[14px]">category</span> Tipo
+          <button 
+            onClick={handleTypeSort} 
+            title="Agrupar por Tipo" 
+            className="px-3 py-1.5 text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-white rounded shadow-sm transition-all flex items-center gap-1"
+          >
+            <span className="material-symbols-outlined text-[14px]">
+              {typeSortOrder === 'zone' ? 'location_on' : 'school'}
+            </span> 
+            Tipo {typeSortOrder === 'zone' ? '(QZP)' : '(Escolas)'}
           </button>
           <button onClick={() => sortPreferences('vacancies-desc')} title="Ordenar Vagas (Maior para Menor)" className="px-3 py-1.5 text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-white rounded shadow-sm transition-all flex items-center gap-1">
             <span className="material-symbols-outlined text-[14px]">arrow_downward</span> Vagas

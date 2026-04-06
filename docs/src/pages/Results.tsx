@@ -9,8 +9,10 @@ import { useVacancies } from '../hooks/useVacancies';
 export function Results() {
   const navigate = useNavigate();
   const { flatResults, qzpMunicipalityMap } = useVacancies();
-  const { addMultiplePreferences } = usePreferences();
+  const { preferences, toggleMultiplePreferences } = usePreferences();
   const filters = useResultsFilters(flatResults);
+  const isAllSaved = filters.displayResults.length > 0 && 
+    filters.displayResults.every(v => preferences.some(p => p.id === v.id));
 
   // UI color logic based on the calculated stats
   let badgeColorClass = filters.highlight 
@@ -51,11 +53,11 @@ export function Results() {
         </div>
         {filters.displayResults.length > 0 && (
           <Button 
-            variant="outline" 
-            icon="bookmark_add" 
-            onClick={() => addMultiplePreferences(filters.displayResults)}
+            variant={isAllSaved ? "secondary" : "outline"} 
+            icon={isAllSaved ? "bookmark_remove" : "bookmark_add"} 
+            onClick={() => toggleMultiplePreferences(filters.displayResults)}
           >
-            Guardar Resultados
+            {isAllSaved ? 'Remover Resultados' : 'Guardar Resultados'}
           </Button>
         )}
         <button onClick={() => navigate(-1)} className="p-2 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors mt-2">

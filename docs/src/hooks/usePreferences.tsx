@@ -4,10 +4,10 @@ import type { Vacancy } from './useVacancies';
 interface PreferencesContextType {
   preferences: Vacancy[];
   togglePreference: (vacancy: Vacancy) => void;
-  addMultiplePreferences: (vacancies: Vacancy[]) => void;
+  toggleMultiplePreferences: (vacancies: Vacancy[]) => void;
   reorderPreferences: (startIndex: number, endIndex: number) => void;
   moveToPosition: (id: string, newPosition: number) => void;
-  sortPreferences: (strategy: 'type' | 'vacancies-desc' | 'vacancies-asc') => void;
+  sortPreferences: (strategy: 'type-zone' | 'type-school' | 'vacancies-desc' | 'vacancies-asc') => void;
   removePreference: (id: string) => void;
 }
 
@@ -31,12 +31,22 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  // 1. Bulk Add (Ignoring duplicates)
-  const addMultiplePreferences = (vacancies: Vacancy[]) => {
+  // 1. Bulk Toggle (Checks if ALL items are already saved to decide whether to add or remove)
+  const toggleMultiplePreferences = (vacancies: Vacancy[]) => {
     setPreferences(prev => {
-      const existingIds = new Set(prev.map(p => p.id));
-      const toAdd = vacancies.filter(v => !existingIds.has(v.id));
-      return [...prev, ...toAdd];
+      const prevIds = new Set(prev.map(p => p.id));
+      const inputIds = new Set(vacancies.map(v => v.id));
+      
+      const isAllSaved = vacancies.length > 0 && vacancies.every(v => prevIds.has(v.id));
+
+      if (isAllSaved) {
+        // Pop them out (only remove the ones passed in the arguments, preserve others)
+        return prev.filter(p => !inputIds.has(p.id));
+      } else {
+        // Append missing items
+        const toAdd = vacancies.filter(v => !prevIds.has(v.id));
+        return [...prev, ...toAdd];
+      }
     });
   };
 
@@ -49,13 +59,10 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  // 2. Move to explicitly typed position (1-based index)
   const moveToPosition = (id: string, targetPosition: number) => {
     setPreferences(prev => {
       const currentIndex = prev.findIndex(p => p.id === id);
       if (currentIndex === -1) return prev;
-
-      // Convert from 1-based (user input) to 0-based array index, bounded safely
       const newIndex = Math.max(0, Math.min(targetPosition - 1, prev.length - 1));
       
       const result = Array.from(prev);
@@ -65,13 +72,14 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  // 3. Automatic Sorting Scenarios
-  const sortPreferences = (strategy: 'type' | 'vacancies-desc' | 'vacancies-asc') => {
+  // 3. Automatic Sorting Scenarios (Updated Type Sorting)
+  const sortPreferences = (strategy: 'type-zone' | 'type-school' | 'vacancies-desc' | 'vacancies-asc') => {
     setPreferences(prev => {
       const sorted = [...prev];
-      if (strategy === 'type') {
-        // Sorts Zones first, then Schools
-        sorted.sort((a, b) => b.type.localeCompare(a.type)); 
+      if (strategy === 'type-zone') {
+        sorted.sort((a, b) => b.type.localeCompare(a.type)); // Z -> S
+      } else if (strategy === 'type-school') {
+        sorted.sort((a, b) => a.type.localeCompare(b.type)); // S -> Z
       } else if (strategy === 'vacancies-desc') {
         sorted.sort((a, b) => b.count - a.count);
       } else if (strategy === 'vacancies-asc') {
@@ -88,7 +96,7 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
   const value = {
     preferences,
     togglePreference,
-    addMultiplePreferences,
+    toggleMultiplePreferences,
     reorderPreferences,
     moveToPosition,
     sortPreferences,
