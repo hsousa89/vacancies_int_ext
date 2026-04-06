@@ -1,7 +1,8 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'gradient';
+  // NEW: added 'danger'
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'gradient' | 'danger';
   icon?: string;
   children: ReactNode;
 }
@@ -14,7 +15,9 @@ export function Button({ variant = 'primary', icon, children, className = '', ..
     secondary: "bg-slate-900 text-white shadow-lg shadow-slate-900/20 hover:opacity-90 hover:-translate-y-0.5",
     gradient: "bg-gradient-to-br from-primary to-primary-container text-on-primary shadow-lg shadow-primary/20 hover:scale-105",
     outline: "bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 hover:text-primary",
-    ghost: "bg-transparent text-slate-600 hover:bg-slate-100"
+    ghost: "bg-transparent text-slate-600 hover:bg-slate-100",
+    // NEW: Danger variant for destructive actions
+    danger: "bg-rose-600 text-white shadow-lg shadow-rose-600/20 hover:bg-rose-700 hover:-translate-y-0.5"
   };
 
   return (
