@@ -3,27 +3,28 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { LocationBanner } from '../components/ui/LocationBanner';
 import { usePreferences } from '../hooks/usePreferences';
-import { useUserLocation } from '../hooks/useUserLocation'; // NEW IMPORT
+import { useUserLocation } from '../hooks/useUserLocation';
 import { useVacancies } from '../hooks/useVacancies';
 import { parseConcelho, parseSchool, parseSubject } from '../utils/formatters';
+
 
 // Local component to handle the typing input state individually per row
 function PreferenceItem({ vacancy, index, total, onMoveUp, onMoveDown, onMoveExact, onRemove }: any) {
   const { code: schoolCode, name: schoolName } = parseSchool(vacancy.school);
-  // Assuming your formatter returns { name, code } for concelho now based on your snippet
+
   const { name: concelhoName } = parseConcelho(vacancy.concelho) || { name: vacancy.concelho };
   const { code: subjectCode, name: subjectName } = parseSubject(vacancy.subjectGroup);
   
   const isFirst = index === 0;
   const isLast = index === total - 1;
 
-  // 1. Get our Global Hooks
+  // 1. Get Global Hooks
   const { qzpMunicipalityMap, getSchoolMetadata } = useVacancies();
   const { calculateDistance, setManualLocation, userLocation } = useUserLocation();
   
   const municipalList = qzpMunicipalityMap[vacancy.qzp];
 
-  // 2. Fetch Data & Calculate exactly like we do in VacancyCard
+  // 2. Fetch Data & Calculate
   const schoolMeta = vacancy.type === 'School' ? getSchoolMetadata(vacancy.concelho, vacancy.school) : null;
   const distanceKm = schoolMeta ? calculateDistance(schoolMeta.school_latitude, schoolMeta.school_longitude) : null;
   const isThisBase = userLocation?.lat === schoolMeta?.school_latitude && userLocation?.lon === schoolMeta?.school_longitude;
@@ -165,11 +166,16 @@ function PreferenceItem({ vacancy, index, total, onMoveUp, onMoveDown, onMoveExa
 }
 
 export function PreferencesPage() {
-  const { preferences, reorderPreferences, removePreference, moveToPosition, sortPreferences, clearPreferences } = usePreferences();
+  // Extract all the tools we need
+  const { getSchoolMetadata } = useVacancies(); // Get the fast lookup tool
+  const { userLocation, calculateDistance } = useUserLocation(); // Get distance tools
+  const { preferences, reorderPreferences, removePreference, moveToPosition, sortPreferences, setPreferencesOrder, clearPreferences } = usePreferences();
   const navigate = useNavigate();
 
+  // Local Sort States
   const [typeSortOrder, setTypeSortOrder] = useState<'zone' | 'school'>('zone');
   const [vacancySortOrder, setVacancySortOrder] = useState<'desc' | 'asc'>('desc');
+  const [distanceSortOrder, setDistanceSortOrder] = useState<'asc' | 'desc'>('asc');
   const [showClearWarning, setShowClearWarning] = useState(false);
 
   const handleTypeSort = () => {
@@ -184,10 +190,45 @@ export function PreferencesPage() {
     sortPreferences(`vacancies-${nextOrder}`);
   };
 
+  // Advanced Distance Sorting
+  const handleDistanceSort = () => {
+    if (!userLocation) return; // Guard clause
+    
+    const nextOrder = distanceSortOrder === 'asc' ? 'desc' : 'asc';
+    setDistanceSortOrder(nextOrder);
+
+    const sorted = [...preferences].sort((a, b) => {
+      // Helper to get distance (returns Infinity if it's a Zone or lacks coordinates)
+      const getDist = (v: any) => {
+        if (v.type === 'School') {
+          const meta = getSchoolMetadata(v.concelho, v.school);
+          if (meta?.school_latitude && meta?.school_longitude) {
+            const d = calculateDistance(meta.school_latitude, meta.school_longitude);
+            if (d !== null) return d;
+          }
+        }
+        return Infinity; 
+      };
+
+      const distA = getDist(a);
+      const distB = getDist(b);
+
+      // Always push QZP Zones (Infinity) to the very bottom regardless of asc/desc direction
+      if (distA === Infinity && distB === Infinity) return 0;
+      if (distA === Infinity) return 1;
+      if (distB === Infinity) return -1;
+
+      return nextOrder === 'asc' ? distA - distB : distB - distA;
+    });
+
+    setPreferencesOrder(sorted);
+  };
+
   const handleConfirmClear = () => {
     clearPreferences();
     setShowClearWarning(false);
   };
+
 
   if (preferences.length === 0) {
     return (
@@ -208,19 +249,19 @@ export function PreferencesPage() {
 
   return (
     <div className="max-w-4xl mx-auto animate-in fade-in duration-300">
-      <div className="mb-6 pt-4 flex flex-col lg:flex-row lg:items-end justify-between gap-4">
+      <div className="mb-6 pt-4 flex flex-col xl:flex-row xl:items-end justify-between gap-4">
         
-        <div className="flex-1 min-w-0 lg:pr-6">
+        <div className="flex-1 min-w-0 xl:pr-6">
           <p className="text-primary font-label text-sm font-bold tracking-wide uppercase flex items-center gap-1.5 mb-1">
             <span className="material-symbols-outlined text-[16px]">bookmarks</span>
             As Minhas Escolhas
           </p>
           <h2 className="text-3xl font-headline font-extrabold text-slate-900 leading-tight">Ordem de Preferência</h2>
-          <p className="text-slate-500 text-sm mt-1">Organize por tipo, por vagas, usando as setas individuais ou <strong>escrevendo a posição na etiqueta</strong>.</p>
+          <p className="text-slate-500 text-sm mt-1">Organize por tipo, vagas ou distância, usando as setas individuais ou <strong>escrevendo a posição na etiqueta</strong>.</p>
         </div>
 
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 flex-shrink-0">
-          <div className="flex flex-1 sm:flex-none items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200">
+          <div className="flex flex-wrap sm:flex-nowrap flex-1 sm:flex-none items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200">
             <button onClick={handleTypeSort} className="flex-1 sm:flex-none px-3 py-1.5 text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-white rounded shadow-sm transition-all flex items-center justify-center gap-1">
               <span className="material-symbols-outlined text-[14px]">
                 {typeSortOrder === 'zone' ? 'location_on' : 'school'}
@@ -232,6 +273,19 @@ export function PreferencesPage() {
                 {vacancySortOrder === 'desc' ? 'arrow_downward' : 'arrow_upward'}
               </span> 
               Vagas {vacancySortOrder === 'desc' ? '(Maior)' : '(Menor)'}
+            </button>
+            
+            {/* DISTANCE SORT BUTTON */}
+            <button 
+              onClick={handleDistanceSort} 
+              disabled={!userLocation}
+              title={!userLocation ? "Ative a localização no banner abaixo primeiro" : "Ordenar por Distância"}
+              className={`flex-1 sm:flex-none px-3 py-1.5 text-xs font-bold rounded shadow-sm transition-all flex items-center justify-center gap-1 ${!userLocation ? 'text-slate-400 bg-slate-50 opacity-60 cursor-not-allowed' : 'text-slate-600 hover:text-slate-900 hover:bg-white'}`}
+            >
+              <span className="material-symbols-outlined text-[14px]">
+                {distanceSortOrder === 'asc' ? 'arrow_downward' : 'arrow_upward'}
+              </span> 
+              Distância {distanceSortOrder === 'asc' ? '(Perto)' : '(Longe)'}
             </button>
           </div>
           

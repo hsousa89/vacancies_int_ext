@@ -8,6 +8,7 @@ interface PreferencesContextType {
   reorderPreferences: (startIndex: number, endIndex: number) => void;
   moveToPosition: (id: string, newPosition: number) => void;
   sortPreferences: (strategy: 'type-zone' | 'type-school' | 'vacancies-desc' | 'vacancies-asc') => void;
+  setPreferencesOrder: (orderedVacancies: Vacancy[]) => void; // NEW
   removePreference: (id: string) => void;
   clearPreferences: () => void;
 }
@@ -32,7 +33,6 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  // 1. Bulk Toggle (Checks if ALL items are already saved to decide whether to add or remove)
   const toggleMultiplePreferences = (vacancies: Vacancy[]) => {
     setPreferences(prev => {
       const prevIds = new Set(prev.map(p => p.id));
@@ -41,10 +41,8 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
       const isAllSaved = vacancies.length > 0 && vacancies.every(v => prevIds.has(v.id));
 
       if (isAllSaved) {
-        // Pop them out (only remove the ones passed in the arguments, preserve others)
         return prev.filter(p => !inputIds.has(p.id));
       } else {
-        // Append missing items
         const toAdd = vacancies.filter(v => !prevIds.has(v.id));
         return [...prev, ...toAdd];
       }
@@ -73,14 +71,13 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  // 3. Automatic Sorting Scenarios (Updated Type Sorting)
   const sortPreferences = (strategy: 'type-zone' | 'type-school' | 'vacancies-desc' | 'vacancies-asc') => {
     setPreferences(prev => {
       const sorted = [...prev];
       if (strategy === 'type-zone') {
-        sorted.sort((a, b) => b.type.localeCompare(a.type)); // Z -> S
+        sorted.sort((a, b) => b.type.localeCompare(a.type)); 
       } else if (strategy === 'type-school') {
-        sorted.sort((a, b) => a.type.localeCompare(b.type)); // S -> Z
+        sorted.sort((a, b) => a.type.localeCompare(b.type)); 
       } else if (strategy === 'vacancies-desc') {
         sorted.sort((a, b) => b.count - a.count);
       } else if (strategy === 'vacancies-asc') {
@@ -88,6 +85,11 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
       }
       return sorted;
     });
+  };
+
+  // Directly set the array order 
+  const setPreferencesOrder = (orderedVacancies: Vacancy[]) => {
+    setPreferences(orderedVacancies);
   };
 
   const removePreference = (id: string) => {
@@ -105,6 +107,7 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
     reorderPreferences,
     moveToPosition,
     sortPreferences,
+    setPreferencesOrder,
     removePreference,
     clearPreferences
   };
