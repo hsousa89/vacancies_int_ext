@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { Button } from '../components/ui/Button';
 import { useDashboardStats } from '../hooks/useDashboarStats';
 
 export function Dashboard() {
@@ -68,9 +69,9 @@ export function Dashboard() {
         <div className="relative z-10">
           <h3 className="text-xl font-headline font-bold mb-2">Exploração Detalhada</h3>
           <p className="text-slate-400 text-sm mb-6 max-w-sm">Consulte as vagas por escola, concelho ou grupo de recrutamento.</p>
-          <button onClick={() => navigate('/query')} className="bg-primary text-white px-6 py-3 rounded-full font-label font-bold text-sm flex items-center gap-2 hover:opacity-90">
-            Iniciar Pesquisa <span className="material-symbols-outlined text-sm">arrow_forward</span>
-          </button>
+          <Button variant="primary" icon="arrow_forward" onClick={() => navigate('/query')}>
+            Iniciar Pesquisa
+          </Button>
         </div>
       </section>
 

@@ -132,7 +132,7 @@ export function PreferencesPage() {
             As Minhas Escolhas
           </p>
           <h2 className="text-3xl font-headline font-extrabold text-slate-900 leading-tight">Ordem de Preferência</h2>
-          <p className="text-slate-500 text-sm mt-1">Organize arrastando ou <strong>escrevendo a posição na etiqueta amarela</strong>.</p>
+          <p className="text-slate-500 text-sm mt-1">Organize usando as setas ou <strong>escrevendo a posição na etiqueta</strong>.</p>
         </div>
 
         {/* AUTOMATIC SORTING BUTTONS */}

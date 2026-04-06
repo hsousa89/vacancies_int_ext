@@ -1,13 +1,16 @@
 import { useNavigate } from 'react-router-dom';
+import { Button } from '../components/ui/Button';
 import { SearchableFilter } from '../components/ui/SearchableFilter';
 import { VacancyCard } from '../components/ui/VacancyCard';
+import { usePreferences } from '../hooks/usePreferences';
 import { useResultsFilters } from '../hooks/useResultsFilters';
 import { useVacancies } from '../hooks/useVacancies';
 
 export function Results() {
   const navigate = useNavigate();
-  const { flatResults, qzpMunicipalityMap } = useVacancies(); // Get the map globally!
-  const filters = useResultsFilters(flatResults); // Get all business logic!
+  const { flatResults, qzpMunicipalityMap } = useVacancies();
+  const { addMultiplePreferences } = usePreferences();
+  const filters = useResultsFilters(flatResults);
 
   // UI color logic based on the calculated stats
   let badgeColorClass = filters.highlight 
@@ -46,7 +49,15 @@ export function Results() {
             em {filters.displayResults.length} registos correspondentes.
           </div>
         </div>
-        
+        {filters.displayResults.length > 0 && (
+          <Button 
+            variant="outline" 
+            icon="bookmark_add" 
+            onClick={() => addMultiplePreferences(filters.displayResults)}
+          >
+            Guardar Resultados
+          </Button>
+        )}
         <button onClick={() => navigate(-1)} className="p-2 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors mt-2">
           <span className="material-symbols-outlined">arrow_back</span>
         </button>

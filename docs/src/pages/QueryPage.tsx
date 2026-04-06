@@ -1,5 +1,6 @@
 // src/pages/QueryPage.tsx
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Button } from '../components/ui/Button';
 import { useVacancies } from '../hooks/useVacancies';
 
 export function QueryPage() {
@@ -102,13 +103,9 @@ export function QueryPage() {
       {/* Floating Action Button to Run Query */}
       {selectedSubjects.length > 0 && (
         <div className="fixed bottom-24 right-6 z-40 animate-in slide-in-from-bottom-10 fade-in duration-300">
-          <button 
-            onClick={handleRunQuery}
-            className="h-14 px-6 rounded-full bg-gradient-to-br from-primary to-primary-container text-on-primary shadow-lg shadow-primary/20 flex items-center justify-center gap-2 transform hover:scale-105 transition-all font-bold"
-          >
-            <span className="material-symbols-outlined" style={{fontVariationSettings: "'FILL' 1"}}>manage_search</span>
-            Pesquisar
-          </button>
+          <Button variant="gradient" icon="manage_search" onClick={handleRunQuery} className="h-14 text-base shadow-2xl">
+            Ver Resultados
+          </Button>
         </div>
       )}
     </div>
