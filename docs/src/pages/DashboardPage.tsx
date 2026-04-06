@@ -7,10 +7,14 @@ export function Dashboard() {
 
   return (
     <div className="max-w-7xl mx-auto animate-in fade-in duration-500 pb-12 px-4">
-      <section className="mb-8 pt-4">
-        <p className="text-secondary font-label text-sm font-medium tracking-wide">PANORAMA NACIONAL 2026</p>
-        <h2 className="text-3xl font-headline font-extrabold text-on-surface leading-tight">Insight Dashboard</h2>
-      </section>
+      <div className="mb-6 pt-4">
+        <p className="text-emerald-600 font-label text-sm font-bold tracking-wide uppercase flex items-center gap-1.5 mb-1">
+          <span className="material-symbols-outlined text-[16px]">bar_chart</span>
+          Panorama Nacional 2026
+        </p>
+        <h2 className="text-3xl font-headline font-extrabold text-slate-900 leading-tight">Painel de Informações</h2>
+        <p className="text-slate-500 text-sm mt-1">Análise detalhada do reordenamento e necessidades do sistema educativo.</p>
+      </div>
 
       {/* Hero Card */}
       <div className="bg-emerald-600 p-8 rounded-2xl border border-emerald-50 flex flex-col md:flex-row justify-between items-center mb-6 relative overflow-hidden shadow-lg shadow-emerald-100">
