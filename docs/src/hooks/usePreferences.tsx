@@ -93,6 +93,10 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
     setPreferences(prev => prev.filter(p => p.id !== id));
   };
 
+  const clearPreferences = () => {
+    setPreferences([]);
+  };
+
   const value = {
     preferences,
     togglePreference,
@@ -100,7 +104,8 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
     reorderPreferences,
     moveToPosition,
     sortPreferences,
-    removePreference
+    removePreference,
+    clearPreferences
   };
 
   return (
