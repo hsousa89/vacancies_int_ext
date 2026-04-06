@@ -35,13 +35,21 @@ export function VacancyCard({ vacancy, municipalitiesList }: VacancyCardProps) {
           >
             {vacancy.count > 0 ? '+' : ''}{vacancy.count} Vagas
           </span>
-          
-          <button 
-            onClick={() => togglePreference(vacancy)}
-            className={`p-1.5 rounded-md transition-colors ${isBookmarked ? 'text-amber-500 bg-amber-50' : 'text-slate-400 hover:bg-slate-100 hover:text-slate-600'}`}
-          >
-            <span className="material-symbols-outlined" style={{ fontVariationSettings: isBookmarked ? "'FILL' 1" : "'FILL' 0" }}>bookmark</span>
-          </button>
+          {/* Bookmark Button with Tooltip */}
+          <div className="relative group/bookmark flex items-center">
+            <button 
+              onClick={() => togglePreference(vacancy)}
+              className={`p-1.5 rounded-md transition-colors ${isBookmarked ? 'text-amber-500 bg-amber-50' : 'text-slate-400 hover:bg-slate-100 hover:text-slate-600'}`}
+              aria-label={isBookmarked ? "Remover das Preferências" : "Guardar nas Preferências"}
+            >
+              <span className="material-symbols-outlined" style={{ fontVariationSettings: isBookmarked ? "'FILL' 1" : "'FILL' 0" }}>bookmark</span>
+            </button>
+            
+            <span className="absolute -top-8 left-1/2 -translate-x-1/2 px-2.5 py-1 bg-slate-800 text-white text-[10px] font-bold rounded-md opacity-0 group-hover/bookmark:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10 shadow-sm">
+              {isBookmarked ? "Remover das Preferências" : "Guardar nas Preferências"}
+              <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-800"></span>
+            </span>
+          </div>
         </div>
       </div>
       <div className="mb-3">

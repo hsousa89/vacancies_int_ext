@@ -202,7 +202,7 @@ export function Results() {
       )}
 
       {/* RESULTS GRID */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-20">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 pb-20">
         {displayResults.map((vacancy) => (
           <VacancyCard 
             key={vacancy.id} 
