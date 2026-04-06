@@ -8,7 +8,7 @@ import { parseConcelho, parseSchool, parseSubject } from '../utils/formatters';
 // Local component to handle the typing input state individually per row
 function PreferenceItem({ vacancy, index, total, onMoveUp, onMoveDown, onMoveExact, onRemove }: any) {
   const { code: schoolCode, name: schoolName } = parseSchool(vacancy.school);
-  const concelhoName = parseConcelho(vacancy.concelho);
+  const { name: concelhoName } = parseConcelho(vacancy.concelho);
   const { code: subjectCode, name: subjectName } = parseSubject(vacancy.subjectGroup);
   const isFirst = index === 0;
   const isLast = index === total - 1;

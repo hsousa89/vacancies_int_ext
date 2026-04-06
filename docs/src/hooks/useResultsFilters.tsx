@@ -29,7 +29,7 @@ export function useResultsFilters(flatResults: Vacancy[]) {
 
   // 2. Options for dropdowns
   const availableZones = useMemo(() => Array.from(new Set(baseResults.map(v => v.qzp))).sort(), [baseResults]);
-  const availableConcelhos = useMemo(() => Array.from(new Set(baseResults.map(v => parseConcelho(v.concelho)).filter(Boolean))).sort(), [baseResults]);
+  const availableConcelhos = useMemo(() => Array.from(new Set(baseResults.map(v => parseConcelho(v.concelho).name).filter(Boolean))).sort(), [baseResults]);
   const availableSchools = useMemo(() => Array.from(new Set(baseResults.map(v => v.school).filter(Boolean) as string[])).sort(), [baseResults]);
 
   const filteredConcelhos = availableConcelhos.filter(c => c.toLowerCase().includes(concelhoQuery.toLowerCase()));

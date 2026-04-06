@@ -8,8 +8,11 @@ export function parseSchool(schoolString?: string) {
 }
 
 export function parseConcelho(concelhoString?: string) {
-  if (!concelhoString) return '';
-  return concelhoString.split(' (')[0];
+  if (!concelhoString) return { name: '', code: '' };
+  const match = concelhoString.match(/^([^(]+)\s*\((\d{4})\)\s*$/);
+  const name = match ? match[1].trim() : concelhoString.split(' (')[0].trim();
+  const code = match ? match[2].trim() : concelhoString.split(' (')[1].replace(')', '').trim();
+  return { name, code };
 }
 
 export function parseSubject(subjectString?: string) {

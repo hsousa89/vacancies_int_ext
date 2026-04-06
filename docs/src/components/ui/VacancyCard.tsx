@@ -1,18 +1,25 @@
 import { usePreferences } from '../../hooks/usePreferences';
 import type { Vacancy } from '../../hooks/useVacancies';
+import { useVacancies } from '../../hooks/useVacancies';
 import { parseConcelho, parseSchool } from '../../utils/formatters';
 
 interface VacancyCardProps {
   vacancy: Vacancy;
   municipalitiesList: string;
+  calculateDistance?: (lat: number | null, lon: number | null) => number | null;
 }
 
-export function VacancyCard({ vacancy, municipalitiesList }: VacancyCardProps) {
+export function VacancyCard({ vacancy, municipalitiesList, calculateDistance }: VacancyCardProps) {
+  const { getSchoolMetadata } = useVacancies();
   const { code: schoolCode, name: schoolName } = parseSchool(vacancy.school);
-  const concelhoName = parseConcelho(vacancy.concelho);
+  const concelhoName = parseConcelho(vacancy.concelho).name;
   const { preferences, togglePreference } = usePreferences();
   const isBookmarked = preferences.some(p => p.id === vacancy.id);
 
+  const schoolMeta = vacancy.type === 'School' ? getSchoolMetadata(vacancy.concelho, vacancy.school) : null;
+  
+  const distanceKm = schoolMeta && calculateDistance ? calculateDistance(schoolMeta.school_latitude, schoolMeta.school_longitude) : null;
+  
   return (
     <div className="p-4 bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col hover:shadow-md transition-shadow">
       
@@ -50,32 +57,54 @@ export function VacancyCard({ vacancy, municipalitiesList }: VacancyCardProps) {
           </div>
         </div>
       </div>
-      <div className="mb-3">
-        <h3 className="font-bold text-slate-900 leading-tight mb-1.5 text-lg">
-          {vacancy.type === 'Zone' 
-            ? '📍 Vagas de Quadro de Zona Pedagógica' 
-            : `🏫 ${schoolName}`
-          }
+      
+      {/* School Name & Observations */}
+      <div className="mb-3 flex-1">
+        <h3 className="font-bold text-slate-900 leading-tight mb-2 text-base sm:text-lg">
+          {vacancy.type === 'Zone' ? '📍 Vagas de Quadro de Zona Pedagógica' : `🏫 ${schoolName}`}
         </h3>
         
-        {/* School Code & Municipality */}
+        {schoolMeta?.school_observations && (
+          <span className="inline-block mb-2 text-[10px] font-bold uppercase tracking-wider bg-purple-100 text-purple-700 px-2 py-0.5 rounded border border-purple-200">
+            {schoolMeta.school_observations}
+          </span>
+        )}
+        
         {vacancy.type === 'School' && (
-          <p className="text-xs text-slate-500 font-medium flex items-center gap-1.5">
-            <span className="font-mono bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded text-slate-700">
-              Cód: {schoolCode}
-            </span>
-            <span>• {concelhoName}</span>
-          </p>
+          <div className="flex flex-col gap-1.5">
+            <p className="text-xs text-slate-500 font-medium flex items-center gap-1.5">
+              <span className="font-mono bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded text-slate-700">Cód: {schoolCode}</span>
+              <span>• {concelhoName}</span>
+            </p>
+
+            {distanceKm !== null && (
+              <p className="text-xs text-slate-500 font-medium flex items-center gap-1">
+                <span className="material-symbols-outlined text-[14px] text-primary">directions_car</span>
+                Aprox. <strong className="text-slate-700">{distanceKm.toFixed(1)} km</strong> de distância
+              </p>
+            )}
+          </div>
         )}
       </div>
       
-      {/* Subject Group is now a secondary badge at the bottom */}
-      <div className="mt-auto pt-3 border-t border-slate-100">
-        <p className="text-[11px] font-bold text-slate-600 bg-slate-50 border border-slate-200 inline-block px-2 py-1 rounded-md">
+      {/* Footer Area */}
+      <div className="mt-auto pt-3 border-t border-slate-100 flex items-center justify-between">
+        <p className="text-[11px] font-bold text-slate-600 bg-slate-50 border border-slate-200 inline-block px-2 py-1 rounded-md max-w-[70%] truncate">
           {vacancy.subjectGroup}
         </p>
-      </div>
 
+        {schoolMeta?.school_maps_place_url && (
+          <a 
+            href={schoolMeta.school_maps_place_url} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="flex items-center justify-center p-1.5 rounded-full bg-slate-50 text-slate-400 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+            title="Ver no Google Maps"
+          >
+            <span className="material-symbols-outlined text-[18px]">map</span>
+          </a>
+        )}
+      </div>
     </div>
   );
 }

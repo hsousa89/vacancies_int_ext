@@ -9,6 +9,7 @@ interface PreferencesContextType {
   moveToPosition: (id: string, newPosition: number) => void;
   sortPreferences: (strategy: 'type-zone' | 'type-school' | 'vacancies-desc' | 'vacancies-asc') => void;
   removePreference: (id: string) => void;
+  clearPreferences: () => void;
 }
 
 const PreferencesContext = createContext<PreferencesContextType | undefined>(undefined);

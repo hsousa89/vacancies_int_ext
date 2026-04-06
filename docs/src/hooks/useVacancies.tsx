@@ -1,5 +1,8 @@
 import { createContext, useContext, useMemo, useState, type ReactNode } from 'react';
+import schoolsDataRaw from '../data/schools.json';
 import vacanciesData from '../data/vacancies2026.json';
+import { parseConcelho, parseSchool } from '../utils/formatters';
+
 
 // Types
 export interface Vacancy {
@@ -59,6 +62,22 @@ function flattenData(data: any): Vacancy[] {
   return flatList;
 }
 
+// School Metadata Interface
+export interface SchoolMetadata {
+  school_url: string | null;
+  school_name: string;
+  school_street: string | null;
+  school_latitude: number | null;
+  school_locality: string | null;
+  school_zip_code: string | null;
+  school_longitude: number | null;
+  school_door_number: string | null;
+  school_observations: string | null;
+  school_phone_number: string | null;
+  school_maps_place_url: string | null;
+  school_maps_plus_code: string | null;
+}
+
 // Context Setup
 interface VacancyContextType {
   allVacancies: any;
@@ -67,6 +86,7 @@ interface VacancyContextType {
   flatResults: Vacancy[];
   qzpMunicipalityMap: Record<string, string>;
   getAvailableSubjects: (scope: 'zone' | 'school') => SubjectOption[];
+  getSchoolMetadata: (concelhoString?: string, schoolString?: string) => SchoolMetadata | null;
 }
 
 const VacancyContext = createContext<VacancyContextType | undefined>(undefined);
@@ -134,6 +154,24 @@ export function VacancyProvider({ children }: { children: ReactNode }) {
     });
   };
 
+  const getSchoolMetadata = (concelhoString?: string, schoolString?: string): SchoolMetadata | null => {
+    if (!concelhoString || !schoolString) return null;
+
+
+    const municipalityCode = parseConcelho(concelhoString)?.code;
+
+    const schoolCode = parseSchool(schoolString)?.code;
+
+    // 3. Double-hash map lookup O(1)
+    if (municipalityCode && schoolCode) {
+      const municipalitySchools = (schoolsDataRaw as Record<string, any>)[municipalityCode];
+      if (municipalitySchools && municipalitySchools[schoolCode]) {
+        return municipalitySchools[schoolCode] as SchoolMetadata;
+      }
+    }
+    return null;
+  };
+
   const value = {
     allVacancies: vacanciesData,
     filteredVacancies,
@@ -141,6 +179,7 @@ export function VacancyProvider({ children }: { children: ReactNode }) {
     flatResults,
     qzpMunicipalityMap,
     getAvailableSubjects,
+    getSchoolMetadata,
   };
 
   return (
