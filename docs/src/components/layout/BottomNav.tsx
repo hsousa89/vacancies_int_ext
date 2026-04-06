@@ -35,9 +35,7 @@ export function BottomNav() {
       <NavItem to="/" icon="dashboard" label="Painel" currentPath={location.pathname} />
       <NavItem to="/query" icon="travel_explore" label="Pesquisa" currentPath={location.pathname} />
       <NavItem to="/results" icon="table_chart" label="Resultados" currentPath={location.pathname} />
-      {preferences.length > 0 && (
-        <NavItem to="/preferences" icon="bookmarks" label="Preferências" currentPath={location.pathname} />
-      )}
+      <NavItem to="/preferences" icon="bookmarks" label="Preferências" currentPath={location.pathname} />
     </nav>
   );
 }
