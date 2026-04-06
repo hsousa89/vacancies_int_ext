@@ -51,14 +51,14 @@ function PreferenceItem({ vacancy, index, total, onMoveUp, onMoveDown, onMoveExa
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-0.5">
           <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded uppercase">{vacancy.qzp}</span>
-          <span className="text-[10px] font-bold text-slate-500 border border-slate-200 px-2 py-0.5 rounded truncate">
+          <span className="text-[10px] font-bold text-slate-500 border border-slate-200 px-2 py-0.5 rounded break-words">
             GR {subjectCode ? subjectCode : subjectName || 'Sem Disciplina Específica'}
           </span>
           <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${vacancy.count > 0 ? 'text-emerald-700 bg-emerald-50' : vacancy.count < 0 ? 'text-rose-700 bg-rose-50' : 'text-slate-600 bg-slate-100'}`}>
             {vacancy.count > 0 ? '+' : ''}{vacancy.count}
           </span>
         </div>
-        <h4 className="font-bold text-slate-900 m-2 text-sm sm:text-base leading-tight truncate">
+        <h4 className="font-bold text-slate-900 m-2 text-sm sm:text-base leading-tight break-words">
           {vacancy.type === 'Zone' ? 'Quadro de Zona Pedagógica' : schoolName}
         </h4>
         {vacancy.type === 'Zone' && (
