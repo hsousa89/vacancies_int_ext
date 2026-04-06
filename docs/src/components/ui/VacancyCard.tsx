@@ -1,5 +1,6 @@
 import { usePreferences } from '../../hooks/usePreferences';
 import type { Vacancy } from '../../hooks/useVacancies';
+import { parseConcelho, parseSchool } from '../../utils/formatters';
 
 interface VacancyCardProps {
   vacancy: Vacancy;
@@ -7,11 +8,8 @@ interface VacancyCardProps {
 }
 
 export function VacancyCard({ vacancy, municipalitiesList }: VacancyCardProps) {
-  // Extract school code and name cleanly
-  const schoolCode = vacancy.school?.split(' - ')[0];
-  // Re-join the rest in case the school name naturally has hyphens in it
-  const schoolName = vacancy.school?.split(' - ').slice(1).join(' - ') || vacancy.school;
-  const concelhoName = vacancy.concelho?.split(' (')[0];
+  const { code: schoolCode, name: schoolName } = parseSchool(vacancy.school);
+  const concelhoName = parseConcelho(vacancy.concelho);
   const { preferences, togglePreference } = usePreferences();
   const isBookmarked = preferences.some(p => p.id === vacancy.id);
 

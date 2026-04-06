@@ -65,7 +65,8 @@ interface VacancyContextType {
   filteredVacancies: any;
   setFilteredVacancies: React.Dispatch<React.SetStateAction<any>>;
   flatResults: Vacancy[];
-  getAvailableSubjects: (scope: 'zone' | 'school') => SubjectOption[]; // <-- ADDED ARGUMENT
+  qzpMunicipalityMap: Record<string, string>;
+  getAvailableSubjects: (scope: 'zone' | 'school') => SubjectOption[];
 }
 
 const VacancyContext = createContext<VacancyContextType | undefined>(undefined);
@@ -73,6 +74,20 @@ const VacancyContext = createContext<VacancyContextType | undefined>(undefined);
 export function VacancyProvider({ children }: { children: ReactNode }) {
   const [filteredVacancies, setFilteredVacancies] = useState<any>(vacanciesData);
   const flatResults = useMemo(() => flattenData(filteredVacancies), [filteredVacancies]);
+  const qzpMunicipalityMap = useMemo(() => {
+    const map: Record<string, Set<string>> = {};
+    flatResults.forEach(v => {
+      if (!map[v.qzp]) map[v.qzp] = new Set();
+      if (v.concelho) map[v.qzp].add(v.concelho.split(' (')[0]); 
+    });
+
+    // Convert Sets to pre-formatted strings for easy UI consumption
+    const stringMap: Record<string, string> = {};
+    for (const key in map) {
+      stringMap[key] = Array.from(map[key]).join(', ');
+    }
+    return stringMap;
+  }, [flatResults]);
 
   const getAvailableSubjects = (scope: 'zone' | 'school'): SubjectOption[] => {
     const subjectTotals = new Map<string, number>();
@@ -124,6 +139,7 @@ export function VacancyProvider({ children }: { children: ReactNode }) {
     filteredVacancies,
     setFilteredVacancies,
     flatResults,
+    qzpMunicipalityMap,
     getAvailableSubjects,
   };
 
