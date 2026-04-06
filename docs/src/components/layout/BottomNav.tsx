@@ -1,5 +1,4 @@
 import { Link, useLocation } from 'react-router-dom';
-import { usePreferences } from '../../hooks/usePreferences';
 
 function NavItem({ to, icon, label, currentPath }: { to: string, icon: string, label: string, currentPath: string }) {
   const isActive = currentPath === to;
@@ -28,7 +27,6 @@ function NavItem({ to, icon, label, currentPath }: { to: string, icon: string, l
 
 export function BottomNav() {
   const location = useLocation();
-  const { preferences } = usePreferences();
   
   return (
     <nav className="fixed bottom-0 left-0 w-full z-50 bg-white/90 backdrop-blur-md shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
