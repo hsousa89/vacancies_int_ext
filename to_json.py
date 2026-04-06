@@ -1,5 +1,110 @@
 import csv
 import json
+import re
+
+
+def schools_to_json(table1_path, output_json_path):
+    database = {}
+
+    with open(table1_path, mode="r", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        data = [row for row in reader]
+
+        for row in data:
+            municipality = (
+                f"0{row['municipality'].strip()}"
+                if len(row["municipality"].strip()) == 3
+                else row["municipality"].strip()
+            )
+            municipality_code = (
+                re.match(r"(\d{4})", municipality).group(1)
+                if re.match(r"(\d{4})", municipality)
+                else f"0{row['municipality_code_2013'].strip()}"
+                if len(row["municipality_code_2013"].strip()) == 3
+                else row["municipality_code_2013"].strip()
+                if row["municipality_code_2013"].strip()
+                else f"0{row['municipality_code'].strip()}"
+                if len(row["municipality_code"].strip()) == 3
+                else row["municipality_code"].strip()
+            )
+            municipality_name = (
+                re.match(r"(.+)\(\d{4}\)", municipality).group(1).strip()
+                if re.match(r"(.+)\(\d{4}\)", municipality)
+                else f"0{row['municipality_name_2013'].strip()}"
+                if len(row["municipality_name_2013"].strip()) == 3
+                else row["municipality_name_2013"].strip()
+                if row["municipality_name_2013"].strip()
+                else f"0{row['municipality_name'].strip()}"
+                if len(row["municipality_name"].strip()) == 3
+                else row["municipality_name"].strip()
+            )
+            school_code = row.get("school_code", "").strip()
+            school_name = (
+                row.get("school_name_2024", "").strip()
+                if row.get("school_name_2024", "").strip()
+                else row.get("school_name_2013", "").strip()
+                if row.get("school_name_2013", "").strip()
+                else row.get("school_name", "").strip()
+            )
+            school_url = row.get("url", "").strip()
+            school_street = row.get("street", "").strip()
+            school_door_number = row.get("door_number", "").strip()
+            school_locality = row.get("locality", "").strip()
+            school_zip_code = row.get("zip_code", "").strip()
+            school_latitude = row.get("latitude", "").strip()
+            school_longitude = row.get("longitude", "").strip()
+            school_phone_number = (
+                row.get("phone_number_2013", "").strip()
+                if row.get("phone_number_2013", "").strip()
+                else row.get("phone_number", "").strip()
+            )
+            school_maps_place_url = row.get("maps_place_url", "").strip()
+            school_maps_plus_code = row.get("maps_plus_code", "").strip()
+            school_observations = (
+                row.get("observations_2024", "").strip()
+                if row.get("observations_2024", "").strip()
+                else row.get("observations_2013", "").strip()
+                if row.get("observations_2013", "").strip()
+                else row.get("observations", "").strip()
+            )
+            if municipality_code not in database:
+                database[municipality_code] = {
+                    "municipality_name": municipality_name,
+                }
+                database[municipality_code][school_code] = {
+                    "school_name": school_name,
+                    "school_url": school_url,
+                    "school_street": school_street,
+                    "school_door_number": school_door_number,
+                    "school_locality": school_locality,
+                    "school_zip_code": school_zip_code,
+                    "school_latitude": school_latitude,
+                    "school_longitude": school_longitude,
+                    "school_phone_number": school_phone_number,
+                    "school_maps_place_url": school_maps_place_url,
+                    "school_maps_plus_code": school_maps_plus_code,
+                    "school_observations": school_observations,
+                }
+            else:
+                database[municipality_code][school_code] = {
+                    "school_name": school_name,
+                    "school_url": school_url,
+                    "school_street": school_street,
+                    "school_door_number": school_door_number,
+                    "school_locality": school_locality,
+                    "school_zip_code": school_zip_code,
+                    "school_latitude": school_latitude,
+                    "school_longitude": school_longitude,
+                    "school_phone_number": school_phone_number,
+                    "school_maps_place_url": school_maps_place_url,
+                    "school_maps_plus_code": school_maps_plus_code,
+                    "school_observations": school_observations,
+                }
+
+    with open(output_json_path, "w", encoding="utf-8") as out_f:
+        json.dump(database, out_f, indent=4, ensure_ascii=False)
+
+    print(f"Successfully saved structured data to {output_json_path}")
 
 
 def build_hierarchical_json(table1_path, table2_path, output_json_path):
@@ -92,4 +197,5 @@ def build_hierarchical_json(table1_path, table2_path, output_json_path):
 
 
 if __name__ == "__main__":
-    build_hierarchical_json("table001.csv", "table002.csv", "structured_vacancies.json")
+    # build_hierarchical_json("table001.csv", "table002.csv", "structured_vacancies.json")
+    schools_to_json("schools2012to2024.csv", "docs/src/data/schools.json")
