@@ -36,9 +36,13 @@ export function QueryPage() {
 
   return (
     <div className="animate-in fade-in duration-300">
-      <div className="mb-8">
-        <h2 className="font-headline text-3xl font-extrabold tracking-tight">Procurar Vagas</h2>
-        <p className="text-secondary font-medium mt-1">Defina o tipo de candidatura e o(s) Grupo(s) de Recrutamento que vai concorrer.</p>
+      <div className="mb-6 pt-4">
+        <p className="text-primary font-label text-sm font-bold tracking-wide uppercase flex items-center gap-1.5 mb-1">
+          <span className="material-symbols-outlined text-[16px]">manage_search</span>
+          A Minha Pesquisa
+        </p>
+        <h2 className="text-3xl font-headline font-extrabold text-slate-900 leading-tight">Filtrar Vagas</h2>
+        <p className="text-slate-500 text-sm mt-1">Selecione o âmbito e os grupos de recrutamento pretendidos para iniciar a pesquisa.</p>
       </div>
 
       <div className="mb-8 bg-surface-container-lowest p-2 rounded-xl flex gap-2 shadow-sm border border-surface-container-high">
