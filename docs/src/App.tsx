@@ -1,21 +1,25 @@
-// src/App.tsx
 import { Route, Routes } from 'react-router-dom';
 import { AppLayout } from './components/layout/AppLayout';
-import { VacancyProvider } from './hooks/useVacancies'; // Add this import
+import { PreferencesProvider } from './hooks/usePreferences';
+import { VacancyProvider } from './hooks/useVacancies';
 import { Dashboard } from './pages/DashboardPage';
+import { PreferencesPage } from './pages/PreferencesPage';
 import { QueryPage } from './pages/QueryPage';
 import { Results } from './pages/Results';
 
 export default function App() {
   return (
     <VacancyProvider>
-      <Routes>
-        <Route element={<AppLayout />}>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/query" element={<QueryPage />} />
-          <Route path="/results" element={<Results />} />
-        </Route>
-      </Routes>
+      <PreferencesProvider>
+        <Routes>
+          <Route element={<AppLayout />}>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/query" element={<QueryPage />} />
+            <Route path="/results" element={<Results />} />
+            <Route path="/preferences" element={<PreferencesPage />} />
+          </Route>
+        </Routes>
+      </PreferencesProvider>
     </VacancyProvider>
   );
 }

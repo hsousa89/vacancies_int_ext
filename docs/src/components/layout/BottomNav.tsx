@@ -1,4 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
+import { usePreferences } from '../../hooks/usePreferences';
 
 // We keep NavItem scoped to this file since it's only used by BottomNav
 function NavItem({ to, icon, label, currentPath }: { to: string, icon: string, label: string, currentPath: string }) {
@@ -28,12 +29,15 @@ function NavItem({ to, icon, label, currentPath }: { to: string, icon: string, l
 
 export function BottomNav() {
   const location = useLocation();
-
+  const { preferences } = usePreferences();
   return (
     <nav className="fixed bottom-0 left-0 w-full z-50 bg-white/90 backdrop-blur-md flex justify-around items-center pt-2 pb-6 px-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
       <NavItem to="/" icon="dashboard" label="Painel" currentPath={location.pathname} />
       <NavItem to="/query" icon="travel_explore" label="Pesquisa" currentPath={location.pathname} />
       <NavItem to="/results" icon="table_chart" label="Resultados" currentPath={location.pathname} />
+      {preferences.length > 0 && (
+        <NavItem to="/preferences" icon="bookmarks" label="Preferências" currentPath={location.pathname} />
+      )}
     </nav>
   );
 }
