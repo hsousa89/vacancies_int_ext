@@ -50,7 +50,7 @@ export function Results() {
       {/* Header */}
       <div className="mb-6 pt-4 flex items-start justify-between">
         <div>
-          <p className="text-blue-600 font-label text-sm font-bold tracking-wide uppercase flex items-center gap-1.5 mb-1">
+          <p className="text-primary font-label text-sm font-bold tracking-wide uppercase flex items-center gap-1.5 mb-1">
             <span className="material-symbols-outlined text-[16px]">list_alt</span>
             Lista de Vagas
           </p>
