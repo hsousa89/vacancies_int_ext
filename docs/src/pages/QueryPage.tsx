@@ -1,109 +1,96 @@
-// src/pages/QueryPage.tsx
-import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
-import { useVacancies } from '../hooks/useVacancies';
+import { MultiSelectInput } from '../components/ui/MultiSelectInput';
+import { useQueryLogic } from '../hooks/useQueryLogic';
+import type { SubjectOption } from '../hooks/useVacancies';
 
 export function QueryPage() {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const { getAvailableSubjects } = useVacancies();
-  
-  // 1. Define the scope first, enforcing it as 'zone' | 'school' for TypeScript
-  const searchScope = (searchParams.get('scope') as 'zone' | 'school') || 'zone';
-  const selectedSubjects = searchParams.getAll('subject');
-
-  // 2. Pass the scope into the function!
-  const allSubjects = getAvailableSubjects(searchScope);
-
-  const setScope = (scope: 'zone' | 'school') => {
-    searchParams.set('scope', scope);
-    setSearchParams(searchParams);
-  };
-
-  const toggleSubject = (subjectId: string) => {
-    const current = new Set(selectedSubjects);
-    if (current.has(subjectId)) current.delete(subjectId);
-    else current.add(subjectId);
-    
-    searchParams.delete('subject');
-    current.forEach(sub => searchParams.append('subject', sub));
-    setSearchParams(searchParams);
-  };
-
-  const handleRunQuery = () => {
-    // Navigate to results page, preserving the search parameters
-    navigate(`/results?${searchParams.toString()}`);
-  };
+  const logic = useQueryLogic();
 
   return (
     <div className="animate-in fade-in duration-300">
       <div className="mb-6 pt-4">
         <p className="text-primary font-label text-sm font-bold tracking-wide uppercase flex items-center gap-1.5 mb-1">
-          <span className="material-symbols-outlined text-[16px]">manage_search</span>
-          A Minha Pesquisa
+          <span className="material-symbols-outlined text-[16px]">travel_explore</span>
+          Pesquisa Avançada
         </p>
-        <h2 className="text-3xl font-headline font-extrabold text-slate-900 leading-tight">Filtrar Vagas</h2>
-        <p className="text-slate-500 text-sm mt-1">Selecione o âmbito e os grupos de recrutamento pretendidos para iniciar a pesquisa.</p>
+        <h2 className="text-3xl font-headline font-extrabold text-slate-900 leading-tight">Configurar Pesquisa</h2>
+        <p className="text-slate-500 text-sm mt-1">Selecione o tipo de vagas e os grupos de recrutamento.</p>
       </div>
 
       <div className="mb-8 bg-surface-container-lowest p-2 rounded-xl flex gap-2 shadow-sm border border-surface-container-high">
         <button 
-          onClick={() => setScope('zone')}
-          className={`flex-1 py-3 rounded-lg font-headline font-bold text-sm transition-all ${searchScope === 'zone' ? 'bg-primary text-on-primary shadow-md' : 'text-on-surface-variant hover:bg-surface-container-low'}`}
+          onClick={() => logic.setScope('zone')}
+          className={`flex-1 px-6 py-2.5 rounded-lg text-sm font-bold ${logic.searchScope === 'zone' ? 'bg-white text-primary border border-primary/20 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
         >
-          Vagas de Quadro de Zona Pedagógica (QZP)
+          Vagas QZP
         </button>
         <button 
-          onClick={() => setScope('school')}
-          className={`flex-1 py-3 rounded-lg font-headline font-bold text-sm transition-all ${searchScope === 'school' ? 'bg-primary text-on-primary shadow-md' : 'text-on-surface-variant hover:bg-surface-container-low'}`}
+          onClick={() => logic.setScope('school')}
+          className={`flex-1 px-6 py-2.5 rounded-lg text-sm font-bold ${logic.searchScope === 'school' ? 'bg-white text-primary border border-primary/20 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
         >
-          Vagas de Quadro de Escola ou Escola Não Agrupada (QA/ENA)
+          Vagas de Escola
         </button>
       </div>
 
-      <div className="mb-6">
-        <h3 className="font-headline text-lg font-bold mb-3">Grupo(s) de Recrutamento que vai concorrer</h3>
-        <div className="flex flex-wrap gap-2">
-          {allSubjects.map((sub) => (
-            <button
-              key={sub.id}
-              // Prevent clicking if it's disabled
-              onClick={() => !sub.isDisabled && toggleSubject(sub.id)}
-              disabled={sub.isDisabled}
-              className={`px-4 py-2 rounded-full text-sm font-medium border flex items-center gap-2 transition-colors ${
-                sub.isDisabled
-                  ? 'bg-slate-50 text-slate-400 border-slate-200 cursor-not-allowed opacity-60' // Disabled styling
-                  : selectedSubjects.includes(sub.id) 
-                  ? 'bg-primary-fixed text-on-primary-fixed border-transparent' // Selected styling
-                  : 'bg-surface-container-lowest text-on-surface-variant border-surface-container-high hover:border-primary/50' // Default styling
-              }`}
-            >
-              <span className={`text-xs font-bold mr-1 ${sub.isDisabled ? 'opacity-50' : 'opacity-60'}`}>
-                {sub.code}
-              </span>
-              {sub.name}
-              
-              <span className={`text-xs ml-1 ${
-                sub.totalVacancies < 0 
-                  ? 'text-rose-400 font-bold opacity-50': sub.totalVacancies === 0
-                  ? 'text-slate-400 font-medium' // Clean grey for exactly 0
-                  : 'text-emerald-900 font-bold opacity-50'
-              }`}>
-                ({sub.totalVacancies > 0 ? '+' : ''}{sub.totalVacancies})
-              </span>
+      <div className="mb-8">
+        <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+          <span className="material-symbols-outlined text-primary">menu_book</span>
+          Grupos de Recrutamento
+        </h3>
+        
+        <div className="mb-4">
+          <MultiSelectInput 
+            selectedOptions={logic.selectedOptions}
+            inputValue={logic.inputValue}
+            onInputChange={logic.setInputValue}
+            onRemove={logic.removeSubject}
+            onTokenize={logic.handleTokenize}
+            placeholder="Escreva um código (ex: 500) ou disciplina (ex: Mat)..."
+          />
+        </div>
 
-              {selectedSubjects.includes(sub.id) && !sub.isDisabled && (
-                <span className="material-symbols-outlined text-[16px] text-emerald-900">check</span>
-              )}
-            </button>
-          ))}
+        <div className="flex flex-wrap gap-2 max-h-[40vh] overflow-y-auto pb-4 pr-2 custom-scrollbar">
+          {logic.filteredSubjects.length === 0 ? (
+            <p className="text-sm text-slate-500 italic p-2">Nenhum grupo encontrado para "{logic.inputValue}".</p>
+          ) : (
+            logic.filteredSubjects.map((sub: SubjectOption) => (
+              <button
+                key={sub.id}
+                onClick={() => logic.toggleSubject(sub.id)}
+                disabled={sub.isDisabled}
+                className={`px-3 py-2 rounded-xl text-left text-sm transition-all border flex items-center max-w-full ${
+                  sub.isDisabled 
+                    ? 'opacity-40 cursor-not-allowed bg-slate-50 border-slate-200 text-slate-500' 
+                    : logic.selectedSubjects.includes(sub.id)
+                    ? 'bg-primary/10 text-primary border-primary/30 shadow-sm' 
+                    : 'bg-white text-slate-700 border-slate-200 hover:border-primary/50' 
+                }`}
+              >
+                <span className={`text-xs font-bold mr-1 ${sub.isDisabled ? 'opacity-50' : 'opacity-60'}`}>
+                  {sub.code}
+                </span>
+                <span className="truncate">{sub.name}</span>
+                
+                <span className={`text-xs ml-1 whitespace-nowrap ${
+                  sub.totalVacancies < 0 ? 'text-rose-400 font-bold opacity-50' : 
+                  sub.totalVacancies === 0 ? 'text-slate-400 font-medium' : 
+                  'text-emerald-900 font-bold opacity-50'
+                }`}>
+                  ({sub.totalVacancies > 0 ? '+' : ''}{sub.totalVacancies})
+                </span>
+
+                {logic.selectedSubjects.includes(sub.id) && !sub.isDisabled && (
+                  <span className="material-symbols-outlined text-[16px] text-primary ml-1">check</span>
+                )}
+              </button>
+            ))
+          )}
         </div>
       </div>
 
-      {/* Floating Action Button to Run Query */}
-      {selectedSubjects.length > 0 && (
+      {logic.selectedSubjects.length > 0 && (
         <div className="fixed bottom-24 right-6 z-40 animate-in slide-in-from-bottom-10 fade-in duration-300">
-          <Button variant="gradient" icon="manage_search" onClick={handleRunQuery} className="h-14 text-base shadow-2xl">
+          <Button variant="gradient" icon="manage_search" onClick={logic.handleRunQuery} className="h-14 text-base shadow-2xl">
             Ver Resultados
           </Button>
         </div>
