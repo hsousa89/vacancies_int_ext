@@ -11,20 +11,16 @@ import { parseConcelho, parseSchool, parseSubject } from '../utils/formatters';
 // Local component to handle the typing input state individually per row
 function PreferenceItem({ vacancy, index, total, onMoveUp, onMoveDown, onMoveExact, onRemove }: any) {
   const { code: schoolCode, name: schoolName } = parseSchool(vacancy.school);
-
   const { name: concelhoName } = parseConcelho(vacancy.concelho) || { name: vacancy.concelho };
   const { code: subjectCode, name: subjectName } = parseSubject(vacancy.subjectGroup);
   
   const isFirst = index === 0;
   const isLast = index === total - 1;
 
-  // 1. Get Global Hooks
   const { qzpMunicipalityMap, getSchoolMetadata } = useVacancies();
   const { calculateDistance, setManualLocation, userLocation } = useUserLocation();
   
   const municipalList = qzpMunicipalityMap[vacancy.qzp];
-
-  // 2. Fetch Data & Calculate
   const schoolMeta = vacancy.type === 'School' ? getSchoolMetadata(vacancy.concelho, vacancy.school) : null;
   const distanceKm = schoolMeta ? calculateDistance(schoolMeta.school_latitude, schoolMeta.school_longitude) : null;
   const isThisBase = userLocation?.lat === schoolMeta?.school_latitude && userLocation?.lon === schoolMeta?.school_longitude;
@@ -45,121 +41,132 @@ function PreferenceItem({ vacancy, index, total, onMoveUp, onMoveDown, onMoveExa
   };
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-3 sm:p-4 shadow-sm flex items-center gap-3 sm:gap-4 transition-all hover:shadow-md hover:border-primary/40 group">
+    <div className="bg-white rounded-xl border border-slate-200 p-3 sm:p-4 shadow-sm flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 transition-all hover:shadow-md hover:border-primary/40 group">
       
-      {/* EDITABLE ORDER BADGE */}
-      <div className="relative group/badge flex-shrink-0">
-        <input 
-          type="number" 
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          onBlur={handleCommit}
-          onKeyDown={(e) => e.key === 'Enter' && handleCommit()}
-          className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/10 text-primary rounded-lg flex items-center justify-center font-bold text-center text-lg border border-primary/20 outline-none focus:ring-2 focus:ring-primary focus:bg-white focus:text-primary transition-all hide-arrows cursor-text"
-          title="Escreva o número para reordenar rapidamente"
-        />
-        <span className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-800 text-white text-[10px] font-bold rounded opacity-0 group-hover/badge:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-10">
-          Editar Ordem
-        </span>
-      </div>
-
-      {/* Data payload */}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-0.5">
-          <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded uppercase">{vacancy.qzp}</span>
-          <span className="text-[10px] font-bold text-slate-500 border border-slate-200 px-2 py-0.5 rounded truncate">
-            GR {subjectCode ? subjectCode : subjectName || 'Sem Disciplina Específica'}
+      {/* 1. MAIN CONTENT */}
+      {/* Changed `items-start` to `items-center` to vertically center the input badge */}
+      <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto flex-1 min-w-0">
+        
+        {/* EDITABLE ORDER BADGE */}
+        <div className="relative group/badge flex-shrink-0">
+          <input 
+            type="number" 
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onBlur={handleCommit}
+            onKeyDown={(e) => e.key === 'Enter' && handleCommit()}
+            className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/10 text-primary rounded-lg flex items-center justify-center font-bold text-center text-lg border border-primary/20 outline-none focus:ring-2 focus:ring-primary focus:bg-white focus:text-primary transition-all hide-arrows cursor-text"
+            title="Escreva o número para reordenar rapidamente"
+          />
+          <span className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-800 text-white text-[10px] font-bold rounded opacity-0 group-hover/badge:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-10 hidden sm:block">
+            Editar Ordem
           </span>
-          <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${vacancy.count > 0 ? 'text-emerald-700 bg-emerald-50' : vacancy.count < 0 ? 'text-rose-700 bg-rose-50' : 'text-slate-600 bg-slate-100'}`}>
-            {vacancy.count > 0 ? '+' : ''}{vacancy.count}
-          </span>
-
-          {/* Interactive Icons */}
-          <div className="ml-auto flex items-center gap-1">
-            {schoolMeta?.school_maps_place_url && (
-              <a 
-                href={schoolMeta.school_maps_place_url} 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="text-slate-400 hover:text-blue-600 transition-colors p-1" 
-                title="Ver no Google Maps"
-              >
-                <span className="material-symbols-outlined text-[16px] block">map</span>
-              </a>
-            )}
-            {schoolMeta?.school_latitude && schoolMeta?.school_longitude && (
-               <button 
-                 onClick={() => setManualLocation(schoolMeta.school_latitude!, schoolMeta.school_longitude!, schoolName)}
-                 className={`p-1 transition-colors ${isThisBase ? 'text-emerald-600' : 'text-slate-400 hover:text-emerald-600'}`}
-                 title={isThisBase ? "Este é o ponto de partida atual" : "Usar como ponto de partida"}
-               >
-                 <span className="material-symbols-outlined text-[16px] block" style={{ fontVariationSettings: isThisBase ? "'FILL' 1" : "'FILL' 0" }}>push_pin</span>
-               </button>
-            )}
-          </div>
         </div>
-        
-        <h4 className="font-bold text-slate-900 my-1 text-sm sm:text-base leading-tight break-words pr-2">
-          {vacancy.type === 'Zone' ? 'Quadro de Zona Pedagógica' : schoolName}
-        </h4>
-        
-        {vacancy.type === 'Zone' && (
-          <p className="text-xs text-slate-500 font-medium flex items-center gap-1.5">
-            <span className="font-mono bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded text-slate-700">
-              {municipalList}
+
+        {/* DATA PAYLOAD */}
+        <div className="flex-1 min-w-0 flex flex-col py-0.5">
+          
+          {/* BIGGER BADGES ROW */}
+          <div className="flex flex-wrap items-center gap-2 mb-1.5">
+            <span className="text-xs font-bold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-md uppercase">
+              {vacancy.qzp}
             </span>
-          </p>
-        )}
-        
-        {vacancy.type === 'School' && (
-          <div className="flex flex-col gap-1.5 mt-1">
-            <p className="text-xs text-slate-500 font-medium flex flex-wrap items-center gap-1.5">
-              <span className="font-mono bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded text-slate-700">
-                Cód: {schoolCode}
-              </span>
-              <span>• {concelhoName}</span>
-              
-              {/* Distance and Base Location Badges */}
-              {distanceKm !== null && !isThisBase && (
-                <span className="ml-1 flex items-center gap-1 text-primary bg-primary/5 px-2 py-0.5 rounded-full border border-primary/20">
-                  <span className="material-symbols-outlined text-[12px]">directions_car</span>
-                  <span className="font-bold">{distanceKm.toFixed(1)} km</span>
-                </span>
-              )}
-              {isThisBase && (
-                <span className="ml-1 flex items-center gap-1 text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 font-bold">
-                  <span className="material-symbols-outlined text-[12px]">push_pin</span>
-                  Ponto de partida
-                </span>
-              )}
-            </p>
-
-            {schoolMeta?.school_observations && (
-              <p>
-                <span className="text-[9px] font-bold uppercase tracking-wider bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded border border-purple-200">
-                  {schoolMeta.school_observations}
-                </span>
-              </p>
-            )}
+            <span className="text-xs font-bold text-slate-600 border border-slate-200 px-2.5 py-1 rounded-md truncate">
+              GR {subjectCode ? subjectCode : subjectName || 'Sem Disciplina'}
+            </span>
+            <span className={`text-xs font-bold px-2.5 py-1 rounded-md ${vacancy.count > 0 ? 'text-emerald-700 bg-emerald-50 border border-emerald-100' : vacancy.count < 0 ? 'text-rose-700 bg-rose-50 border border-rose-100' : 'text-slate-600 bg-slate-100 border border-slate-200'}`}>
+              {vacancy.count > 0 ? '+' : ''}{vacancy.count}
+            </span>
           </div>
-        )}
+          
+          <div className="flex items-start justify-between gap-2">
+            <h4 className="font-bold text-slate-900 my-0.5 text-sm sm:text-base leading-tight break-words pr-2">
+              {vacancy.type === 'Zone' ? 'Quadro de Zona Pedagógica' : schoolName}
+            </h4>
+            
+            {/* DESKTOP-ONLY ICONS */}
+            <div className="hidden sm:flex items-center gap-1 flex-shrink-0">
+              {schoolMeta?.school_maps_place_url && (
+                <a href={schoolMeta.school_maps_place_url} target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-blue-600 transition-colors p-1" title="Ver no Google Maps">
+                  <span className="material-symbols-outlined text-[16px] block">map</span>
+                </a>
+              )}
+              {schoolMeta?.school_latitude && schoolMeta?.school_longitude && (
+                 <button onClick={() => setManualLocation(schoolMeta.school_latitude!, schoolMeta.school_longitude!, schoolName)} className={`p-1 transition-colors ${isThisBase ? 'text-emerald-600' : 'text-slate-400 hover:text-emerald-600'}`} title={isThisBase ? "Este é o ponto de partida atual" : "Usar como ponto de partida"}>
+                   <span className="material-symbols-outlined text-[16px] block" style={{ fontVariationSettings: isThisBase ? "'FILL' 1" : "'FILL' 0" }}>push_pin</span>
+                 </button>
+              )}
+            </div>
+          </div>
+          
+          {vacancy.type === 'Zone' && (
+            <p className="text-xs text-slate-500 font-medium flex items-center gap-1.5 mt-1">
+              <span className="font-mono bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded text-slate-700">{municipalList}</span>
+            </p>
+          )}
+          
+          {vacancy.type === 'School' && (
+            <div className="flex flex-col gap-1 mt-1">
+              <p className="text-xs text-slate-500 font-medium flex flex-wrap items-center gap-1.5">
+                <span className="font-mono bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded text-slate-700">Cód: {schoolCode}</span>
+                <span>• {concelhoName}</span>
+                
+                {distanceKm !== null && !isThisBase && (
+                  <span className="ml-1 flex items-center gap-1 text-primary bg-primary/5 px-2 py-0.5 rounded-full border border-primary/20">
+                    <span className="material-symbols-outlined text-[12px]">directions_car</span>
+                    <span className="font-bold">{distanceKm.toFixed(1)} km</span>
+                  </span>
+                )}
+                {isThisBase && (
+                  <span className="ml-1 flex items-center gap-1 text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 font-bold">
+                    <span className="material-symbols-outlined text-[12px]">push_pin</span> Ponto de partida
+                  </span>
+                )}
+              </p>
+              {schoolMeta?.school_observations && (
+                <p className="mt-0.5">
+                  <span className="text-[9px] font-bold uppercase tracking-wider bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded border border-purple-200">{schoolMeta.school_observations}</span>
+                </p>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Action Buttons */}
-      <div className="flex items-center gap-1 sm:gap-2 opacity-100 sm:opacity-40 sm:group-hover:opacity-100 transition-opacity">
-        <div className="flex flex-col gap-1">
-          <button onClick={() => onMoveUp(index)} disabled={isFirst} className="p-1 rounded bg-slate-50 text-slate-500 hover:bg-primary/10 hover:text-primary disabled:opacity-30">
-            <span className="material-symbols-outlined text-[16px] block">arrow_drop_up</span>
-          </button>
-          <button onClick={() => onMoveDown(index)} disabled={isLast} className="p-1 rounded bg-slate-50 text-slate-500 hover:bg-primary/10 hover:text-primary disabled:opacity-30">
-            <span className="material-symbols-outlined text-[16px] block">arrow_drop_down</span>
+      {/* 2. ACTION BOTTOM BAR (Mobile) / RIGHT ALIGNED (Desktop) */}
+      <div className="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto pt-3 sm:pt-0 mt-2 sm:mt-0 border-t border-slate-100 sm:border-0 opacity-100 sm:opacity-40 sm:group-hover:opacity-100 transition-opacity">
+        
+        {/* MOBILE-ONLY QUICK ACTIONS (Icon Only) */}
+        <div className="flex sm:hidden items-center gap-2">
+          {schoolMeta?.school_maps_place_url && (
+            <a href={schoolMeta.school_maps_place_url} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-10 h-10 rounded-lg bg-slate-50 text-slate-500 border border-slate-200 hover:bg-slate-100 transition-colors">
+              <span className="material-symbols-outlined text-[20px]">map</span>
+            </a>
+          )}
+          {schoolMeta?.school_latitude && schoolMeta?.school_longitude && (
+             <button onClick={() => setManualLocation(schoolMeta.school_latitude!, schoolMeta.school_longitude!, schoolName)} className={`flex items-center justify-center w-10 h-10 rounded-lg border transition-colors ${isThisBase ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'}`}>
+               <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: isThisBase ? "'FILL' 1" : "'FILL' 0" }}>push_pin</span>
+             </button>
+          )}
+        </div>
+
+        {/* ORDERING ARROWS & TRASH */}
+        <div className="flex items-center gap-1">
+          <div className="flex gap-1 sm:flex-col">
+            <button onClick={() => onMoveUp(index)} disabled={isFirst} className="p-2 sm:p-1 rounded-lg sm:rounded bg-slate-50 sm:bg-transparent text-slate-500 border border-slate-200 sm:border-transparent hover:bg-primary/10 hover:text-primary disabled:opacity-30">
+              <span className="material-symbols-outlined text-[18px] sm:text-[16px] block">arrow_upward</span>
+            </button>
+            <button onClick={() => onMoveDown(index)} disabled={isLast} className="p-2 sm:p-1 rounded-lg sm:rounded bg-slate-50 sm:bg-transparent text-slate-500 border border-slate-200 sm:border-transparent hover:bg-primary/10 hover:text-primary disabled:opacity-30">
+              <span className="material-symbols-outlined text-[18px] sm:text-[16px] block">arrow_downward</span>
+            </button>
+          </div>
+          
+          <button onClick={() => onRemove(vacancy.id)} className="p-2.5 rounded-lg text-rose-500 sm:text-slate-400 bg-rose-50 sm:bg-transparent hover:bg-rose-100 hover:text-rose-600 transition-colors ml-1" title="Remover">
+            <span className="material-symbols-outlined text-[20px]">delete</span>
           </button>
         </div>
-        
-        <button onClick={() => onRemove(vacancy.id)} className="p-2.5 rounded-lg text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-colors ml-1" title="Remover">
-          <span className="material-symbols-outlined text-[20px]">delete</span>
-        </button>
       </div>
+      
     </div>
   );
 }
@@ -175,7 +182,7 @@ export function PreferencesPage() {
   const [distanceSortOrder, setDistanceSortOrder] = useState<'asc' | 'desc'>('asc'); 
   const [showClearWarning, setShowClearWarning] = useState(false);
 
-  // NEW: Calculate the sum of all vacancies selected
+  // Calculate the sum of all vacancies selected
   const totalVacanciesCount = preferences.reduce((sum, vacancy) => sum + vacancy.count, 0);
 
   const handleTypeSort = () => {
