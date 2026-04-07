@@ -1,0 +1,112 @@
+[
+    {
+        "question": "Como posso aceder ao sistema de candidatura (SIGRHE)?",
+        "answer": "Deve aceder ao Sistema Interativo de Gestão dos Recursos Humanos da Educação (SIGRHE) e autenticar-se, preferencialmente, através da Autenticação.gov com Chave Móvel Digital. Em alternativa, pode utilizar a autenticação via Autoridade Tributária ou, caso não tenha conta, efetuar o registo diretamente na página do SIGRHE.",
+        "labels": "Acesso, SIGRHE"
+    },
+    {
+        "question": "Qual é o prazo de candidatura para o ano escolar 2026/2027?",
+        "answer": "O prazo para apresentação da candidatura decorre entre 1 de abril e as 23:59 horas (Portugal continental) de 13 de abril de 2026. Este período corresponde a oito dias úteis.",
+        "labels": "Prazos, Geral"
+    },
+    {
+        "question": "Quais são os principais tipos de procedimentos concursais disponíveis?",
+        "answer": "Os concursos podem revestir a natureza de concurso interno (para docentes de carreira), concurso externo (para ingresso na carreira) e concursos para satisfação de necessidades temporárias, que incluem mobilidade interna, contratação inicial e reserva de recrutamento.",
+        "labels": "Tipos de Recrutamento, Geral"
+    },
+    {
+        "question": "Quem se pode candidatar ao Concurso Interno?",
+        "answer": "Podem candidatar-se docentes de carreira vinculados a um agrupamento de escolas (AE), escola não agrupada (EnA) ou quadro de zona pedagógica (QZP) que pretendam transferência ou transição de grupo. Também se aplica a docentes das Regiões Autónomas e docentes em licença sem vencimento de longa duração que não obtiveram vaga no regresso.",
+        "labels": "Elegibilidade, Concurso Interno"
+    },
+    {
+        "question": "Quem se pode candidatar ao Concurso Externo?",
+        "answer": "O concurso externo destina-se a docentes profissionalizados que pretendam ingressar na carreira. Podem também concorrer docentes em licença sem vencimento de longa duração sem vaga de regresso e, condicionalmente, alunos a frequentar Mestrado em Ensino.",
+        "labels": "Elegibilidade, Concurso Externo"
+    },
+    {
+        "question": "Os alunos de Mestrado em Ensino podem candidatar-se?",
+        "answer": "Sim, os alunos que se encontrem a frequentar Mestrado em Ensino podem candidatar-se ao concurso externo de provimento. No entanto, devem prever poder comprovar a conclusão do grau até ao último dia do prazo de reclamação das listas provisórias, sendo admitidos condicionalmente até essa prova.",
+        "labels": "Elegibilidade, Habilitações"
+    },
+    {
+        "question": "Como devo manifestar as minhas preferências por escolas ou zonas?",
+        "answer": "Os candidatos manifestam as suas preferências por ordem decrescente de prioridade utilizando códigos de AE/EnA, QZP ou concelho. Indicar um código de QZP significa ser opositor a todos os AE/EnA dessa zona, sendo a colocação feita por ordem crescente do código de escola.",
+        "labels": "Preferências"
+    },
+    {
+        "question": "Posso alterar os dados da minha candidatura após a submissão?",
+        "answer": "A submissão é irreversível. Correções ou desistências só podem ocorrer em fases específicas, como a de revisão ou reclamação, e apenas para campos definidos legalmente como alteráveis.",
+        "labels": "Procedimentos, SIGRHE"
+    },
+    {
+        "question": "Que documentação é necessária para a candidatura?",
+        "answer": "Os elementos do formulário devem ser comprovados mediante fotocópia simples. São exigidos documentos de habilitações profissionais, declaração de robustez física, perfil psíquico e registo criminal (ou autorização de acesso ao mesmo).",
+        "labels": "Documentação, Requisitos"
+    },
+    {
+        "question": "Estou isento de entregar algum documento?",
+        "answer": "Sim, os candidatos estão dispensados de entregar documentos que já se encontrem arquivados e válidos no seu processo individual na escola que procede à validação da candidatura. A exceção é o registo criminal atualizado ou a autorização de acesso ao mesmo.",
+        "labels": "Documentação, Procedimentos"
+    },
+    {
+        "question": "O que é o mecanismo de 'Vinculação Dinâmica'?",
+        "answer": "É um processo que permite o ingresso mais célere na carreira. Para tal, o docente deve possuir pelo menos 1095 dias de serviço e ter celebrado contratos a termo resolutivo com o Ministério da Educação nos dois anos escolares anteriores, cumprindo requisitos mínimos de dias de serviço em cada um desses anos.",
+        "labels": "Vinculação Dinâmica, Concurso Externo"
+    },
+    {
+        "question": "Como é contado o tempo de serviço para efeitos de graduação?",
+        "answer": "O tempo de serviço é contado até 31 de agosto do ano anterior ao concurso. Inclui tempo como educador ou professor em jardins de infância, escolas básicas/secundárias, creches, ensino superior público e como agente de cooperação. O serviço prestado antes da qualificação profissional é ponderado pelo fator 0,5.",
+        "labels": "Tempo de Serviço, Graduação"
+    },
+    {
+        "question": "Quais são as prioridades no Concurso Externo?",
+        "answer": "A 1.ª prioridade é para candidatos que cumpram os requisitos de vinculação dinâmica. A 2.ª prioridade destina-se a profissionalizados com pelo menos 365 dias de serviço nos últimos seis anos em estabelecimentos da rede pública ou protocolados. A 3.ª prioridade abrange os restantes candidatos profissionalizados.",
+        "labels": "Prioridades, Concurso Externo"
+    },
+    {
+        "question": "O que acontece se eu for colocado e não aceitar a colocação?",
+        "answer": "O não cumprimento do dever de aceitação determina a anulação da colocação obtida. Para docentes de carreira, implica a obrigatoriedade de apresentação ao concurso de mobilidade interna. Para docentes contratados, impede a colocação em funções docentes nesse ano escolar.",
+        "labels": "Colocação, Penalidades"
+    },
+    {
+        "question": "Quando e onde me devo apresentar se for colocado?",
+        "answer": "Os candidatos colocados nos concursos interno, externo, mobilidade interna e contratação inicial devem apresentar-se na escola onde foram colocados no primeiro dia útil de setembro. Caso a apresentação presencial seja impossível por motivos legais (ex: doença), o facto deve ser comunicado à escola no prazo de cinco dias úteis.",
+        "labels": "Colocação, Apresentação"
+    },
+    {
+        "question": "Como posso reclamar das listas provisórias?",
+        "answer": "A reclamação deve ser apresentada em formulário eletrónico no SIGRHE no prazo de cinco dias úteis a contar do dia imediato ao da publicitação das listas provisórias. A não apresentação de reclamação equivale à aceitação de todos os dados constantes nas listas.",
+        "labels": "Reclamações, Listas"
+    },
+    {
+        "question": "Existe uma quota de emprego para pessoas com deficiência?",
+        "answer": "Sim, a quota destina-se a candidatos portadores de deficiência. Se um candidato nesta situação for colocado numa vaga não reservada, o sistema verifica se teria uma colocação mais favorável através da quota, prevalecendo nesse caso a opção mais benéfica.",
+        "labels": "Quota de Emprego, Elegibilidade"
+    },
+    {
+        "question": "O que são 'Horários Compostos'?",
+        "answer": "São horários que agregam necessidades letivas de dois AE/EnA distintos. Para garantir condições de trabalho, os estabelecimentos não podem distar mais de 15 km entre si por estrada (salvo acordo do docente) e o horário deve prever tempos de deslocação e pausas para refeições.",
+        "labels": "Horários, Condições de Trabalho"
+    },
+    {
+        "question": "Quem é obrigado a concorrer à Mobilidade Interna?",
+        "answer": "São obrigatoriamente candidatos os docentes de QZP e os docentes de quadro de escola (QA/QE) a quem não tenham sido atribuídas, pelo menos, oito horas de componente letiva. Docentes de carreira que não cumpram deveres de aceitação ou apresentação também podem ser obrigados a este concurso.",
+        "labels": "Elegibilidade, Mobilidade Interna"
+    },
+    {
+        "question": "Quais as consequências de prestar falsas declarações?",
+        "answer": "A prestação de falsas declarações ou confirmações indevidas resulta na anulação da colocação, sem prejuízo de procedimentos disciplinares e criminais. Candidatos que pratiquem atos ilícitos como a sabotagem das plataformas eletrónicas são igualmente excluídos e alvo de participação criminal pela AGSE.",
+        "labels": "Penalidades, Procedimentos"
+    },
+    {
+        "question": "Como funciona o desempate em caso de igualdade de graduação?",
+        "answer": "O desempate respeita a seguinte ordem: classificação profissional mais elevada, maior tempo de serviço pós-profissionalização, maior tempo de serviço pré-profissionalização, maior idade e, por fim, o número de candidatura mais baixo.",
+        "labels": "Graduação, Ordenação"
+    },
+    {
+        "question": "A quantos grupos de recrutamento me posso candidatar?",
+        "answer": "No concurso externo, os candidatos podem ser opositores a um máximo de quatro grupos de recrutamento para os quais possuam qualificação profissional. No concurso interno, podem concorrer simultaneamente à transferência no grupo atual e à transição para outro grupo.",
+        "labels": "Candidatura, Habilitações"
+    }
+]
