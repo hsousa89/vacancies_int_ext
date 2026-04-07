@@ -10,8 +10,9 @@ interface MultiSelectInputProps {
   inputValue: string;
   onInputChange: (val: string) => void;
   onRemove: (id: string) => void;
-  onTokenize: (val: string) => void; // Triggered when a token is "committed"
+  onTokenize: (val: string) => void;
   placeholder?: string;
+  maxItems?: number;
 }
 
 export function MultiSelectInput({
@@ -20,10 +21,10 @@ export function MultiSelectInput({
   onInputChange,
   onRemove,
   onTokenize,
-  placeholder = "Pesquisar ou adicionar..."
+  placeholder = "Pesquisar ou adicionar...",
+  maxItems
 }: MultiSelectInputProps) {
   
-  // Intercept keystrokes to create tokens on Enter, Comma, or Semicolon
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' || e.key === ',' || e.key === ';') {
       e.preventDefault();
@@ -31,12 +32,10 @@ export function MultiSelectInput({
         onTokenize(inputValue.trim());
       }
     } else if (e.key === 'Backspace' && inputValue === '' && selectedOptions.length > 0) {
-      // UX Bonus: Pressing backspace on an empty input deletes the last chip
       onRemove(selectedOptions[selectedOptions.length - 1].id);
     }
   };
 
-  // Intercept typing/pasting to instantly split multiple items separated by commas
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     if (val.includes(',') || val.includes(';')) {
@@ -53,8 +52,11 @@ export function MultiSelectInput({
     }
   };
 
+  // Check if we have reached the limit
+  const isLimitReached = maxItems !== undefined && selectedOptions.length >= maxItems;
+
   return (
-    <div className="flex flex-wrap items-center gap-2 p-2 border border-slate-200 rounded-xl bg-white shadow-sm focus-within:ring-2 focus-within:ring-primary focus-within:border-primary transition-all cursor-text min-h-[52px]">
+    <div className={`flex flex-wrap items-center gap-2 p-2 border border-slate-200 rounded-xl bg-white shadow-sm transition-all min-h-[52px] ${!isLimitReached ? 'focus-within:ring-2 focus-within:ring-primary focus-within:border-primary cursor-text' : ''}`}>
       <span className="material-symbols-outlined text-slate-400 ml-2">search</span>
       
       {/* Render the "Chips" */}
@@ -73,15 +75,17 @@ export function MultiSelectInput({
         </span>
       ))}
       
-      {/* The actual input field */}
-      <input
-        type="text"
-        value={inputValue}
-        onChange={handleChange}
-        onKeyDown={handleKeyDown}
-        placeholder={selectedOptions.length === 0 ? placeholder : ""}
-        className="flex-1 min-w-[150px] bg-transparent outline-none text-sm text-slate-800 placeholder-slate-400 p-1"
-      />
+      {/* Conditionally render the input field only if limit is not reached */}
+      {!isLimitReached && (
+        <input
+          type="text"
+          value={inputValue}
+          onChange={handleChange}
+          onKeyDown={handleKeyDown}
+          placeholder={selectedOptions.length === 0 ? placeholder : ""}
+          className="flex-1 min-w-[150px] bg-transparent outline-none text-sm text-slate-800 placeholder-slate-400 p-1"
+        />
+      )}
     </div>
   );
 }
