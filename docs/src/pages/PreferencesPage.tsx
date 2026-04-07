@@ -74,7 +74,7 @@ function PreferenceItem({ vacancy, index, total, onMoveUp, onMoveDown, onMoveExa
             {vacancy.count > 0 ? '+' : ''}{vacancy.count}
           </span>
 
-          {/* Interactive Icons placed cleanly on the top right line */}
+          {/* Interactive Icons */}
           <div className="ml-auto flex items-center gap-1">
             {schoolMeta?.school_maps_place_url && (
               <a 
@@ -134,7 +134,6 @@ function PreferenceItem({ vacancy, index, total, onMoveUp, onMoveDown, onMoveExa
               )}
             </p>
 
-            {/* Display School Observations (like TEIP) */}
             {schoolMeta?.school_observations && (
               <p>
                 <span className="text-[9px] font-bold uppercase tracking-wider bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded border border-purple-200">
@@ -166,17 +165,18 @@ function PreferenceItem({ vacancy, index, total, onMoveUp, onMoveDown, onMoveExa
 }
 
 export function PreferencesPage() {
-  // Extract all the tools we need
-  const { getSchoolMetadata } = useVacancies(); // Get the fast lookup tool
-  const { userLocation, calculateDistance } = useUserLocation(); // Get distance tools
+  const { getSchoolMetadata } = useVacancies();
+  const { userLocation, calculateDistance } = useUserLocation(); 
   const { preferences, reorderPreferences, removePreference, moveToPosition, sortPreferences, setPreferencesOrder, clearPreferences } = usePreferences();
   const navigate = useNavigate();
 
-  // Local Sort States
   const [typeSortOrder, setTypeSortOrder] = useState<'zone' | 'school'>('zone');
   const [vacancySortOrder, setVacancySortOrder] = useState<'desc' | 'asc'>('desc');
-  const [distanceSortOrder, setDistanceSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [distanceSortOrder, setDistanceSortOrder] = useState<'asc' | 'desc'>('asc'); 
   const [showClearWarning, setShowClearWarning] = useState(false);
+
+  // NEW: Calculate the sum of all vacancies selected
+  const totalVacanciesCount = preferences.reduce((sum, vacancy) => sum + vacancy.count, 0);
 
   const handleTypeSort = () => {
     const nextOrder = typeSortOrder === 'zone' ? 'school' : 'zone';
@@ -190,15 +190,13 @@ export function PreferencesPage() {
     sortPreferences(`vacancies-${nextOrder}`);
   };
 
-  // Advanced Distance Sorting
   const handleDistanceSort = () => {
-    if (!userLocation) return; // Guard clause
+    if (!userLocation) return;
     
     const nextOrder = distanceSortOrder === 'asc' ? 'desc' : 'asc';
     setDistanceSortOrder(nextOrder);
 
     const sorted = [...preferences].sort((a, b) => {
-      // Helper to get distance (returns Infinity if it's a Zone or lacks coordinates)
       const getDist = (v: any) => {
         if (v.type === 'School') {
           const meta = getSchoolMetadata(v.concelho, v.school);
@@ -213,7 +211,6 @@ export function PreferencesPage() {
       const distA = getDist(a);
       const distB = getDist(b);
 
-      // Always push QZP Zones (Infinity) to the very bottom regardless of asc/desc direction
       if (distA === Infinity && distB === Infinity) return 0;
       if (distA === Infinity) return 1;
       if (distB === Infinity) return -1;
@@ -228,7 +225,6 @@ export function PreferencesPage() {
     clearPreferences();
     setShowClearWarning(false);
   };
-
 
   if (preferences.length === 0) {
     return (
@@ -257,10 +253,27 @@ export function PreferencesPage() {
             As Minhas Escolhas
           </p>
           <h2 className="text-3xl font-headline font-extrabold text-slate-900 leading-tight">Ordem de Preferência</h2>
-          <p className="text-slate-500 text-sm mt-1">Organize por tipo, vagas ou distância, usando as setas individuais ou <strong>escrevendo a posição na etiqueta</strong>.</p>
+          <p className="text-slate-500 text-sm mt-1 mb-4">Organize por tipo, vagas ou distância, usando as setas individuais ou <strong>escrevendo a posição na etiqueta</strong>.</p>
+          
+          {/* NEW: Stats Badges */}
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="bg-blue-50 border border-blue-100 text-blue-700 px-3 py-1.5 rounded-lg text-sm font-bold flex items-center gap-1.5 shadow-sm">
+              <span className="material-symbols-outlined text-[18px]">format_list_numbered</span>
+              {preferences.length} {preferences.length === 1 ? 'Escolha' : 'Escolhas'}
+            </div>
+            
+            <div className={`px-3 py-1.5 rounded-lg border text-sm font-bold flex items-center gap-1.5 shadow-sm ${
+              totalVacanciesCount > 0 ? 'bg-emerald-50 border-emerald-100 text-emerald-700' :
+              totalVacanciesCount < 0 ? 'bg-rose-50 border-rose-100 text-rose-700' :
+              'bg-slate-50 border-slate-200 text-slate-600'
+            }`}>
+              <span className="material-symbols-outlined text-[18px]">work</span>
+              {totalVacanciesCount > 0 ? '+' : ''}{totalVacanciesCount} {Math.abs(totalVacanciesCount) === 1 ? 'Vaga em Potencial' : 'Vagas em Potencial'}
+            </div>
+          </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 flex-shrink-0">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 flex-shrink-0 mt-4 xl:mt-0">
           <div className="flex flex-wrap sm:flex-nowrap flex-1 sm:flex-none items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200">
             <button onClick={handleTypeSort} className="flex-1 sm:flex-none px-3 py-1.5 text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-white rounded shadow-sm transition-all flex items-center justify-center gap-1">
               <span className="material-symbols-outlined text-[14px]">
@@ -275,7 +288,6 @@ export function PreferencesPage() {
               Vagas {vacancySortOrder === 'desc' ? '(Maior)' : '(Menor)'}
             </button>
             
-            {/* DISTANCE SORT BUTTON */}
             <button 
               onClick={handleDistanceSort} 
               disabled={!userLocation}
@@ -299,7 +311,6 @@ export function PreferencesPage() {
         </div>
       </div>
 
-      {/* PLUG AND PLAY LOCATION BANNER */}
       <LocationBanner />
 
       <div className="flex flex-col gap-3 mb-10 mt-2">
@@ -324,7 +335,6 @@ export function PreferencesPage() {
         </Button>
       </div>
       
-      {/* BOTTOM WARNING SHEET */}
       {showClearWarning && (
         <>
           <div 
