@@ -243,16 +243,53 @@ export function Dashboard() {
         </div>
       </section>
 
-      {/* EXPLORE FOOTER */}
-      <section className="bg-slate-900 text-white p-8 rounded-2xl relative overflow-hidden shadow-xl mb-12">
-        <div className="relative z-10">
-          <h3 className="text-xl font-headline font-bold mb-2">Exploração Detalhada</h3>
-          <p className="text-slate-400 text-sm mb-6 max-w-sm">Consulte as vagas por escola, concelho ou grupo de recrutamento.</p>
-          <Button variant="primary" icon="arrow_forward" onClick={() => navigate('/query')}>
-            Iniciar Pesquisa
-          </Button>
-        </div>
-      </section>
+      {/* CTA CARDS GRID */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-12">
+        
+        {/* Search CTA */}
+        <section className="bg-slate-900 text-white p-8 md:p-10 rounded-2xl relative overflow-hidden shadow-xl shadow-slate-200/50">
+          <div className="relative z-10 h-full flex flex-col items-start justify-between">
+            <div>
+              <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center mb-4 text-primary-200">
+                <span className="material-symbols-outlined">search</span>
+              </div>
+              <h3 className="text-xl font-headline font-bold mb-2">Exploração Detalhada</h3>
+              <p className="text-slate-400 text-sm mb-8 max-w-sm">
+                Consulte ativamente as vagas por escola, concelho ou grupo de recrutamento específico.
+              </p>
+            </div>
+            <Button variant="primary" icon="arrow_forward" onClick={() => navigate('/query')}>
+              Iniciar Pesquisa
+            </Button>
+          </div>
+          <div className="absolute -right-10 -bottom-10 w-48 h-48 bg-primary/20 rounded-full blur-3xl pointer-events-none"></div>
+        </section>
+
+        {/* FAQs CTA */}
+        <section className="bg-indigo-950 text-white p-8 md:p-10 rounded-2xl relative overflow-hidden shadow-xl shadow-slate-200/50">
+          <div className="relative z-10 h-full flex flex-col items-start justify-between">
+            <div>
+              <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center mb-4 text-indigo-300">
+                <span className="material-symbols-outlined">help</span>
+              </div>
+              <h3 className="text-xl font-headline font-bold mb-2">Dúvidas sobre o Concurso?</h3>
+              <p className="text-indigo-200/70 text-sm mb-8 max-w-sm">
+                Consulte as respostas às perguntas mais frequentes sobre regras, prazos e utilização do SIGRHE.
+              </p>
+            </div>
+            <button 
+              onClick={() => navigate('/faqs')}
+              className="bg-white text-indigo-950 hover:bg-indigo-50 font-bold text-sm px-5 py-2.5 rounded-lg shadow-sm transition-all flex items-center gap-2"
+            >
+              Consultar FAQs
+              <span className="material-symbols-outlined text-[18px]">library_books</span>
+            </button>
+          </div>
+          {/* Decorative blur elements matching the new indigo theme */}
+          <div className="absolute -right-10 -bottom-10 w-48 h-48 bg-indigo-600/30 rounded-full blur-3xl pointer-events-none"></div>
+        </section>
+
+      </div>
 
       <footer className="pt-6 border-t border-slate-200 flex justify-between items-center opacity-50 text-[11px] font-bold uppercase">
         <p className="text-[11px] font-bold tracking-widest uppercase">
