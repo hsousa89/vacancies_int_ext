@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
+import { ExportActions } from '../components/ui/ExportActions';
 import { LocationBanner } from '../components/ui/LocationBanner';
 import { usePreferences } from '../hooks/usePreferences';
 import { useUserLocation } from '../hooks/useUserLocation';
 import { useVacancies } from '../hooks/useVacancies';
 import { parseConcelho, parseSchool, parseSubject } from '../utils/formatters';
-
 
 // Local component to handle the typing input state individually per row
 function PreferenceItem({ vacancy, index, total, onMoveUp, onMoveDown, onMoveExact, onRemove }: any) {
@@ -44,7 +44,6 @@ function PreferenceItem({ vacancy, index, total, onMoveUp, onMoveDown, onMoveExa
     <div className="bg-white rounded-xl border border-slate-200 p-3 sm:p-4 shadow-sm flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 transition-all hover:shadow-md hover:border-primary/40 group">
       
       {/* 1. MAIN CONTENT */}
-      {/* Changed `items-start` to `items-center` to vertically center the input badge */}
       <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto flex-1 min-w-0">
         
         {/* EDITABLE ORDER BADGE */}
@@ -65,8 +64,6 @@ function PreferenceItem({ vacancy, index, total, onMoveUp, onMoveDown, onMoveExa
 
         {/* DATA PAYLOAD */}
         <div className="flex-1 min-w-0 flex flex-col py-0.5">
-          
-          {/* BIGGER BADGES ROW */}
           <div className="flex flex-wrap items-center gap-2 mb-1.5">
             <span className="text-xs font-bold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-md uppercase">
               {vacancy.qzp}
@@ -84,7 +81,6 @@ function PreferenceItem({ vacancy, index, total, onMoveUp, onMoveDown, onMoveExa
               {vacancy.type === 'Zone' ? 'Quadro de Zona Pedagógica' : schoolName}
             </h4>
             
-            {/* DESKTOP-ONLY ICONS */}
             <div className="hidden sm:flex items-center gap-1 flex-shrink-0">
               {schoolMeta?.school_maps_place_url && (
                 <a href={schoolMeta.school_maps_place_url} target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-blue-600 transition-colors p-1" title="Ver no Google Maps">
@@ -133,10 +129,8 @@ function PreferenceItem({ vacancy, index, total, onMoveUp, onMoveDown, onMoveExa
         </div>
       </div>
 
-      {/* 2. ACTION BOTTOM BAR (Mobile) / RIGHT ALIGNED (Desktop) */}
+      {/* 2. ACTION BOTTOM BAR */}
       <div className="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto pt-3 sm:pt-0 mt-2 sm:mt-0 border-t border-slate-100 sm:border-0 opacity-100 sm:opacity-40 sm:group-hover:opacity-100 transition-opacity">
-        
-        {/* MOBILE-ONLY QUICK ACTIONS (Icon Only) */}
         <div className="flex sm:hidden items-center gap-2">
           {schoolMeta?.school_maps_place_url && (
             <a href={schoolMeta.school_maps_place_url} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-10 h-10 rounded-lg bg-slate-50 text-slate-500 border border-slate-200 hover:bg-slate-100 transition-colors">
@@ -150,7 +144,6 @@ function PreferenceItem({ vacancy, index, total, onMoveUp, onMoveDown, onMoveExa
           )}
         </div>
 
-        {/* ORDERING ARROWS & TRASH */}
         <div className="flex items-center gap-1">
           <div className="flex gap-1 sm:flex-col">
             <button onClick={() => onMoveUp(index)} disabled={isFirst} className="p-2 sm:p-1 rounded-lg sm:rounded bg-slate-50 sm:bg-transparent text-slate-500 border border-slate-200 sm:border-transparent hover:bg-primary/10 hover:text-primary disabled:opacity-30">
@@ -160,13 +153,11 @@ function PreferenceItem({ vacancy, index, total, onMoveUp, onMoveDown, onMoveExa
               <span className="material-symbols-outlined text-[18px] sm:text-[16px] block">arrow_downward</span>
             </button>
           </div>
-          
           <button onClick={() => onRemove(vacancy.id)} className="p-2.5 rounded-lg text-rose-500 sm:text-slate-400 bg-rose-50 sm:bg-transparent hover:bg-rose-100 hover:text-rose-600 transition-colors ml-1" title="Remover">
             <span className="material-symbols-outlined text-[20px]">delete</span>
           </button>
         </div>
       </div>
-      
     </div>
   );
 }
@@ -182,7 +173,6 @@ export function PreferencesPage() {
   const [distanceSortOrder, setDistanceSortOrder] = useState<'asc' | 'desc'>('asc'); 
   const [showClearWarning, setShowClearWarning] = useState(false);
 
-  // Calculate the sum of all vacancies selected
   const totalVacanciesCount = preferences.reduce((sum, vacancy) => sum + vacancy.count, 0);
 
   const handleTypeSort = () => {
@@ -199,7 +189,6 @@ export function PreferencesPage() {
 
   const handleDistanceSort = () => {
     if (!userLocation) return;
-    
     const nextOrder = distanceSortOrder === 'asc' ? 'desc' : 'asc';
     setDistanceSortOrder(nextOrder);
 
@@ -262,7 +251,6 @@ export function PreferencesPage() {
           <h2 className="text-3xl font-headline font-extrabold text-slate-900 leading-tight">Ordem de Preferência</h2>
           <p className="text-slate-500 text-sm mt-1 mb-4">Organize por tipo, vagas ou distância, usando as setas individuais ou <strong>escrevendo a posição na etiqueta</strong>.</p>
           
-          {/* NEW: Stats Badges */}
           <div className="flex flex-wrap items-center gap-3">
             <div className="bg-blue-50 border border-blue-100 text-blue-700 px-3 py-1.5 rounded-lg text-sm font-bold flex items-center gap-1.5 shadow-sm">
               <span className="material-symbols-outlined text-[18px]">format_list_numbered</span>
@@ -280,40 +268,47 @@ export function PreferencesPage() {
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 flex-shrink-0 mt-4 xl:mt-0">
-          <div className="flex flex-wrap sm:flex-nowrap flex-1 sm:flex-none items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200">
-            <button onClick={handleTypeSort} className="flex-1 sm:flex-none px-3 py-1.5 text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-white rounded shadow-sm transition-all flex items-center justify-center gap-1">
+        {/* RESPONSIVE TOOLBAR CONTAINER */}
+        <div className="flex flex-wrap gap-2 flex-shrink-0 mt-4 xl:mt-0 w-full xl:w-auto">
+          
+          {/* SORTING TOOLBAR */}
+          <div className="flex flex-1 lg:flex-none items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200">
+            <button onClick={handleTypeSort} className="flex-1 px-3 py-1.5 text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-white rounded shadow-sm transition-all flex items-center justify-center gap-1 whitespace-nowrap">
               <span className="material-symbols-outlined text-[14px]">
                 {typeSortOrder === 'zone' ? 'location_on' : 'school'}
               </span> 
-              Tipo {typeSortOrder === 'zone' ? '(QZP)' : '(Escolas)'}
+              Tipo <span className="hidden md:inline">{typeSortOrder === 'zone' ? '(QZP)' : '(Escolas)'}</span>
             </button>
-            <button onClick={handleVacancySort} className="flex-1 sm:flex-none px-3 py-1.5 text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-white rounded shadow-sm transition-all flex items-center justify-center gap-1">
+            <button onClick={handleVacancySort} className="flex-1 px-3 py-1.5 text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-white rounded shadow-sm transition-all flex items-center justify-center gap-1 whitespace-nowrap">
               <span className="material-symbols-outlined text-[14px]">
                 {vacancySortOrder === 'desc' ? 'arrow_downward' : 'arrow_upward'}
               </span> 
-              Vagas {vacancySortOrder === 'desc' ? '(Maior)' : '(Menor)'}
+              Vagas <span className="hidden md:inline">{vacancySortOrder === 'desc' ? '(Maior)' : '(Menor)'}</span>
             </button>
             
             <button 
               onClick={handleDistanceSort} 
               disabled={!userLocation}
               title={!userLocation ? "Ative a localização no banner abaixo primeiro" : "Ordenar por Distância"}
-              className={`flex-1 sm:flex-none px-3 py-1.5 text-xs font-bold rounded shadow-sm transition-all flex items-center justify-center gap-1 ${!userLocation ? 'text-slate-400 bg-slate-50 opacity-60 cursor-not-allowed' : 'text-slate-600 hover:text-slate-900 hover:bg-white'}`}
+              className={`flex-1 px-3 py-1.5 text-xs font-bold rounded shadow-sm transition-all flex items-center justify-center gap-1 whitespace-nowrap ${!userLocation ? 'text-slate-400 bg-slate-50 opacity-60 cursor-not-allowed' : 'text-slate-600 hover:text-slate-900 hover:bg-white'}`}
             >
               <span className="material-symbols-outlined text-[14px]">
                 {distanceSortOrder === 'asc' ? 'arrow_downward' : 'arrow_upward'}
               </span> 
-              Distância {distanceSortOrder === 'asc' ? '(Perto)' : '(Longe)'}
+              Distância <span className="hidden md:inline">{distanceSortOrder === 'asc' ? '(Perto)' : '(Longe)'}</span>
             </button>
           </div>
+
+          {/* EXPORT TOOLBAR */}
+          <ExportActions preferences={preferences} />
           
+          {/* CLEAR ALL BUTTON */}
           <button 
             onClick={() => setShowClearWarning(true)} 
-            className="flex-1 sm:flex-none px-3 py-2 bg-white border border-slate-200 text-rose-600 hover:bg-rose-50 hover:border-rose-200 rounded-lg shadow-sm transition-all flex items-center justify-center gap-1.5 text-xs font-bold"
+            className="flex-1 lg:flex-none px-3 py-2 bg-white border border-slate-200 text-rose-600 hover:bg-rose-50 hover:border-rose-200 rounded-lg shadow-sm transition-all flex items-center justify-center gap-1.5 text-xs font-bold whitespace-nowrap"
           >
             <span className="material-symbols-outlined text-[16px]">delete_sweep</span>
-            Limpar Tudo
+            <span className="hidden md:inline">Limpar Tudo</span>
           </button>
         </div>
       </div>
