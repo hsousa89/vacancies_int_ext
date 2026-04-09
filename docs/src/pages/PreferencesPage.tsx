@@ -242,9 +242,12 @@ export function PreferencesPage() {
 
   return (
     <div className="max-w-4xl mx-auto animate-in fade-in duration-300">
-      <div className="mb-6 pt-4 flex flex-col xl:flex-row xl:items-end justify-between gap-4">
+      
+      {/* PERFECTLY RESPONSIVE HEADER - NO MORE FORCED SIDE-BY-SIDE */}
+      <div className="mb-6 pt-4 flex flex-col gap-5">
         
-        <div className="flex-1 min-w-0 xl:pr-6">
+        {/* TOP ROW: Title & Badges */}
+        <div className="w-full">
           <p className="text-primary font-label text-sm font-bold tracking-wide uppercase flex items-center gap-1.5 mb-1">
             <span className="material-symbols-outlined text-[16px]">bookmarks</span>
             As Minhas Escolhas
@@ -284,18 +287,18 @@ export function PreferencesPage() {
           </div>
         </div>
 
-        {/* RESPONSIVE TOOLBAR CONTAINER */}
-        <div className="flex flex-wrap gap-2 flex-shrink-0 mt-4 xl:mt-0 w-full xl:w-auto">
+        {/* BOTTOM ROW: Action Toolbars */}
+        <div className="flex flex-wrap items-center gap-2 w-full pt-1">
           
           {/* SORTING TOOLBAR */}
-          <div className="flex flex-1 lg:flex-none items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200">
-            <button onClick={handleTypeSort} className="flex-1 px-3 py-1.5 text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-white rounded shadow-sm transition-all flex items-center justify-center gap-1 whitespace-nowrap">
+          <div className="flex flex-1 md:flex-none items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200">
+            <button onClick={handleTypeSort} className="flex-1 md:flex-none px-3 py-1.5 text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-white rounded shadow-sm transition-all flex items-center justify-center gap-1 whitespace-nowrap">
               <span className="material-symbols-outlined text-[14px]">
                 {typeSortOrder === 'zone' ? 'location_on' : 'school'}
               </span> 
               Tipo <span className="hidden md:inline">{typeSortOrder === 'zone' ? '(QZP)' : '(Escolas)'}</span>
             </button>
-            <button onClick={handleVacancySort} className="flex-1 px-3 py-1.5 text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-white rounded shadow-sm transition-all flex items-center justify-center gap-1 whitespace-nowrap">
+            <button onClick={handleVacancySort} className="flex-1 md:flex-none px-3 py-1.5 text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-white rounded shadow-sm transition-all flex items-center justify-center gap-1 whitespace-nowrap">
               <span className="material-symbols-outlined text-[14px]">
                 {vacancySortOrder === 'desc' ? 'arrow_downward' : 'arrow_upward'}
               </span> 
@@ -306,7 +309,7 @@ export function PreferencesPage() {
               onClick={handleDistanceSort} 
               disabled={!userLocation}
               title={!userLocation ? "Ative a localização no banner abaixo primeiro" : "Ordenar por Distância"}
-              className={`flex-1 px-3 py-1.5 text-xs font-bold rounded shadow-sm transition-all flex items-center justify-center gap-1 whitespace-nowrap ${!userLocation ? 'text-slate-400 bg-slate-50 opacity-60 cursor-not-allowed' : 'text-slate-600 hover:text-slate-900 hover:bg-white'}`}
+              className={`flex-1 md:flex-none px-3 py-1.5 text-xs font-bold rounded shadow-sm transition-all flex items-center justify-center gap-1 whitespace-nowrap ${!userLocation ? 'text-slate-400 bg-slate-50 opacity-60 cursor-not-allowed' : 'text-slate-600 hover:text-slate-900 hover:bg-white'}`}
             >
               <span className="material-symbols-outlined text-[14px]">
                 {distanceSortOrder === 'asc' ? 'arrow_downward' : 'arrow_upward'}
@@ -318,14 +321,15 @@ export function PreferencesPage() {
           {/* EXPORT TOOLBAR */}
           <ExportActions preferences={preferences} />
           
-          {/* CLEAR ALL BUTTON */}
+          {/* CLEAR ALL BUTTON - Uses md:ml-auto to snap to the far right on desktop! */}
           <button 
             onClick={() => setShowClearWarning(true)} 
-            className="flex-1 lg:flex-none px-3 py-2 bg-white border border-slate-200 text-rose-600 hover:bg-rose-50 hover:border-rose-200 rounded-lg shadow-sm transition-all flex items-center justify-center gap-1.5 text-xs font-bold whitespace-nowrap"
+            className="flex-1 md:flex-none md:ml-auto px-4 py-2 bg-white border border-slate-200 text-rose-600 hover:bg-rose-50 hover:border-rose-200 rounded-lg shadow-sm transition-all flex items-center justify-center gap-1.5 text-xs font-bold whitespace-nowrap"
           >
             <span className="material-symbols-outlined text-[16px]">delete_sweep</span>
             <span className="hidden md:inline">Limpar Tudo</span>
           </button>
+
         </div>
       </div>
 
