@@ -78,7 +78,11 @@ export function LocationProvider({ children }: { children: ReactNode }) {
 
     const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c;
+    
+    const straightLineDistance = R * c;
+    
+    // Multiply by a Detour Index of 1.35 to simulate real-world road networks
+    return straightLineDistance * 1.35; 
   };
 
   const value = {
