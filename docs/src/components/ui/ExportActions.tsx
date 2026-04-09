@@ -1,3 +1,4 @@
+import { useUserLocation } from '../../hooks/useUserLocation';
 import { useVacancies, type Vacancy } from '../../hooks/useVacancies';
 import { parseConcelho, parseSchool, parseSubject } from '../../utils/formatters';
 
@@ -7,6 +8,8 @@ interface ExportActionsProps {
 
 export function ExportActions({ preferences }: ExportActionsProps) {
   const { getSchoolMetadata } = useVacancies();
+  // Call the location hook
+  const { calculateDistance, userLocation } = useUserLocation();
 
   if (preferences.length === 0) return null;
 
@@ -22,11 +25,20 @@ export function ExportActions({ preferences }: ExportActionsProps) {
       
       const location = isSchool ? `🏫 ${schoolName} (Cód: ${schoolCode})` : `🗺️ QZP ${p.qzp.replace('QZP.', '')}`;
       const meta = isSchool ? getSchoolMetadata(p.concelho, p.school) : null;
+      let distanceText = "";
+      if (isSchool && meta?.school_latitude && meta?.school_longitude && userLocation) {
+        const dist = calculateDistance(meta.school_latitude, meta.school_longitude);
+        if (dist !== null) {
+          distanceText = `🚗 ~${dist.toFixed(1)} km\n`;
+        }
+      }
 
       shareText += `*${idx + 1}º* ${location}\n`;
       shareText += `📚 GR ${subject.code} - ${subject.name}\n`;
       shareText += `💼 ${vacanciesCount} vaga(s)\n`;
-      
+      if (distanceText) {
+        shareText += distanceText;
+      }
       if (meta?.school_observations) {
         shareText += `📌 Observações: ${meta.school_observations}\n`;
       }
@@ -52,7 +64,7 @@ export function ExportActions({ preferences }: ExportActionsProps) {
 
   // --- EXPORT TO EXCEL (CSV) FUNCTIONALITY ---
   const handleExportExcel = () => {
-    let csvContent = "Prioridade,Tipo,QZP,Concelho,Escola,Codigo_Escola,Grupo_Recrutamento,Vagas,Observacoes\n";
+    let csvContent = "Prioridade,Tipo,QZP,Concelho,Escola,Codigo_Escola,Grupo_Recrutamento,Vagas,Distancia_km,Observacoes\n";
 
     preferences.forEach((p, index) => {
       const prioridade = index + 1;
@@ -70,8 +82,16 @@ export function ExportActions({ preferences }: ExportActionsProps) {
 
       const meta = p.type === 'School' ? getSchoolMetadata(p.concelho, p.school) : null;
       const obs = meta?.school_observations ? `"${meta.school_observations}"` : '';
+      // Calculate the distance for the CSV row
+      let distancia = 'N/A';
+      if (p.type === 'School' && meta?.school_latitude && meta?.school_longitude && userLocation) {
+        const dist = calculateDistance(meta.school_latitude, meta.school_longitude);
+        if (dist !== null) {
+          distancia = dist.toFixed(1);
+        }
+      }
 
-      csvContent += `${prioridade},${tipo},${qzp},${concelho},${escola},${codigoEscola},${grupo},${vagas},${obs}\n`;
+      csvContent += `${prioridade},${tipo},${qzp},${concelho},${escola},${codigoEscola},${grupo},${vagas},${distancia},${obs}\n`;
     });
 
     const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
