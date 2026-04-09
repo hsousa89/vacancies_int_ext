@@ -1,4 +1,4 @@
-import { useCallback } from 'react'; // NEW
+import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { LocationBanner } from '../components/ui/LocationBanner';
@@ -7,16 +7,16 @@ import { VacancyCard } from '../components/ui/VacancyCard';
 import { usePreferences } from '../hooks/usePreferences';
 import { useResultsFilters } from '../hooks/useResultsFilters';
 import { useUserLocation } from '../hooks/useUserLocation';
-import type { Vacancy } from '../hooks/useVacancies'; // NEW
+import type { Vacancy } from '../hooks/useVacancies';
 import { useVacancies } from '../hooks/useVacancies';
 
 export function Results() {
   const navigate = useNavigate();
-  const { flatResults, qzpMunicipalityMap, getSchoolMetadata } = useVacancies(); // NEW: Extracted getSchoolMetadata
+  const { flatResults, qzpMunicipalityMap, getSchoolMetadata } = useVacancies();
   const { preferences, toggleMultiplePreferences } = usePreferences();
   const { userLocation, calculateDistance } = useUserLocation();
 
-  // NEW: Create a pure callback to calculate distance for the filter hook
+  // Create a pure callback to calculate distance for the filter hook
   const getDistance = useCallback((vacancy: Vacancy) => {
     if (vacancy.type !== 'School' || !userLocation) return null;
     const meta = getSchoolMetadata(vacancy.concelho, vacancy.school);
@@ -24,7 +24,7 @@ export function Results() {
     return calculateDistance(meta.school_latitude, meta.school_longitude);
   }, [userLocation, getSchoolMetadata, calculateDistance]);
 
-  // NEW: Pass the callback into the hook
+  // Pass the callback into the hook
   const filters = useResultsFilters(flatResults, getDistance);
 
   const isAllSaved = filters.displayResults.length > 0 && 
@@ -101,7 +101,7 @@ export function Results() {
           
           <div className="p-4 border-t border-slate-100 flex flex-col gap-6">
             
-            {/* NEW: DISTANCE SLIDER (Only for schools) */}
+            {/* DISTANCE SLIDER (Only for schools) */}
             {filters.scope === 'school' && (
               <div className="bg-slate-50 border border-slate-100 p-4 rounded-xl">
                 <div className="flex items-center justify-between mb-2">
