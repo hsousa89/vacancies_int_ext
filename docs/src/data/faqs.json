@@ -1,7 +1,7 @@
 [
     {
         "question": "Como posso aceder ao sistema de candidatura (SIGRHE)?",
-        "answer": "Deve aceder ao Sistema Interativo de Gestão dos Recursos Humanos da Educação (SIGRHE) e autenticar-se, preferencialmente, através da Autenticação.gov com Chave Móvel Digital. Em alternativa, pode utilizar a autenticação via Autoridade Tributária ou, caso não tenha conta, efetuar o registo diretamente na página do SIGRHE.",
+        "answer": "Deve aceder ao Sistema Interativo de Gestão dos Recursos Humanos da Educação ([SIGRHE](https://sigrhe.dgae.mec.pt)) e autenticar-se das seguintes formas:\n\n1. Através da Autenticação.gov com Chave Móvel Digital (Preferencial).\n2. Via Autoridade Tributária.\n3. Caso não tenha conta, pode efetuar o registo diretamente na página.\n\nSe tiver dúvidas, consulte o manual oficial.",
         "labels": "Acesso, SIGRHE"
     },
     {
@@ -60,8 +60,13 @@
         "labels": "Tempo de Serviço, Graduação"
     },
     {
+        "question": "Quais são as prioridades no Concurso Interno?",
+        "answer": "No Concurso Interno, a ordenação dos candidatos é feita de acordo com duas prioridades principais.\n\nA 1.ª prioridade destina-se aos docentes de carreira que pretendam a transferência para outro quadro de Agrupamento de Escolas ou Escola não Agrupada (AE/EnA) ou para um lugar em Quadro de Zona Pedagógica (QZP).\nA 2.ª prioridade abrange os docentes de carreira vinculados que pretendam transitar de grupo de recrutamento, desde que sejam portadores da qualificação profissional adequada para o novo grupo.\nAdicionalmente, os docentes de carreira provenientes das Regiões Autónomas são ordenados nestas mesmas prioridades em condições de reciprocidade.\nDentro de cada prioridade, a ordenação dos candidatos para a colocação é determinada pela sua graduação profissional em ordem decrescente, seguida de critérios de desempate como tempo de serviço e idade.",
+        "labels": "Prioridades, Concurso Interno"
+    },
+    {
         "question": "Quais são as prioridades no Concurso Externo?",
-        "answer": "A 1.ª prioridade é para candidatos que cumpram os requisitos de vinculação dinâmica. A 2.ª prioridade destina-se a profissionalizados com pelo menos 365 dias de serviço nos últimos seis anos em estabelecimentos da rede pública ou protocolados. A 3.ª prioridade abrange os restantes candidatos profissionalizados.",
+        "answer": "No Concurso Externo, a ordenação dos candidatos é feita de acordo com três prioridades principais.\n\nA 1.ª prioridade é para candidatos que cumpram os requisitos de vinculação dinâmica.\nA 2.ª prioridade destina-se a profissionalizados com pelo menos 365 dias de serviço nos últimos seis anos em estabelecimentos da rede pública ou protocolados.\nA 3.ª prioridade abrange os restantes candidatos profissionalizados.",
         "labels": "Prioridades, Concurso Externo"
     },
     {
@@ -76,7 +81,7 @@
     },
     {
         "question": "Como posso reclamar das listas provisórias?",
-        "answer": "A reclamação deve ser apresentada em formulário eletrónico no SIGRHE no prazo de cinco dias úteis a contar do dia imediato ao da publicitação das listas provisórias. A não apresentação de reclamação equivale à aceitação de todos os dados constantes nas listas.",
+        "answer": "A reclamação deve ser apresentada em formulário eletrónico no ([SIGRHE](https://sigrhe.dgae.mec.pt)) no prazo de cinco dias úteis a contar do dia imediato ao da publicitação das listas provisórias. A não apresentação de reclamação equivale à aceitação de todos os dados constantes nas listas.",
         "labels": "Reclamações, Listas"
     },
     {
