@@ -173,7 +173,8 @@ export function PreferencesPage() {
   const [distanceSortOrder, setDistanceSortOrder] = useState<'asc' | 'desc'>('asc'); 
   const [showClearWarning, setShowClearWarning] = useState(false);
 
-  const totalVacanciesCount = preferences.reduce((sum, vacancy) => sum + vacancy.count, 0);
+  const totalPositiveVacancies = preferences.reduce((sum, vacancy) => vacancy.count > 0 ? sum + vacancy.count : sum, 0);
+  const totalNegativeVacancies = preferences.reduce((sum, vacancy) => vacancy.count < 0 ? sum + vacancy.count : sum, 0);
 
   const handleTypeSort = () => {
     const nextOrder = typeSortOrder === 'zone' ? 'school' : 'zone';
@@ -257,14 +258,29 @@ export function PreferencesPage() {
               {preferences.length} {preferences.length === 1 ? 'Escolha' : 'Escolhas'}
             </div>
             
-            <div className={`px-3 py-1.5 rounded-lg border text-sm font-bold flex items-center gap-1.5 shadow-sm ${
-              totalVacanciesCount > 0 ? 'bg-emerald-50 border-emerald-100 text-emerald-700' :
-              totalVacanciesCount < 0 ? 'bg-rose-50 border-rose-100 text-rose-700' :
-              'bg-slate-50 border-slate-200 text-slate-600'
-            }`}>
-              <span className="material-symbols-outlined text-[18px]">work</span>
-              {totalVacanciesCount > 0 ? '+' : ''}{totalVacanciesCount} {Math.abs(totalVacanciesCount) === 1 ? 'Vaga em Potencial' : 'Vagas em Potencial'}
-            </div>
+            {/* Positive Vacancies Badge */}
+            {totalPositiveVacancies > 0 && (
+              <div className="bg-emerald-50 border border-emerald-100 text-emerald-700 px-3 py-1.5 rounded-lg text-sm font-bold flex items-center gap-1.5 shadow-sm">
+                <span className="material-symbols-outlined text-[18px]">work</span>
+                +{totalPositiveVacancies} {totalPositiveVacancies === 1 ? 'Vaga' : 'Vagas'}
+              </div>
+            )}
+
+            {/* Negative Vacancies Badge */}
+            {totalNegativeVacancies < 0 && (
+              <div className="bg-rose-50 border border-rose-100 text-rose-700 px-3 py-1.5 rounded-lg text-sm font-bold flex items-center gap-1.5 shadow-sm">
+                <span className="material-symbols-outlined text-[18px]">work_off</span>
+                {totalNegativeVacancies} {totalNegativeVacancies === -1 ? 'Vaga' : 'Vagas'}
+              </div>
+            )}
+
+            {/* Fallback if all chosen schools have exactly 0 */}
+            {totalPositiveVacancies === 0 && totalNegativeVacancies === 0 && (
+              <div className="bg-slate-50 border border-slate-200 text-slate-600 px-3 py-1.5 rounded-lg text-sm font-bold flex items-center gap-1.5 shadow-sm">
+                <span className="material-symbols-outlined text-[18px]">work</span>
+                0 Vagas
+              </div>
+            )}
           </div>
         </div>
 
